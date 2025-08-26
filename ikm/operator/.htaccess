@@ -1,0 +1,20 @@
+<IfModule mod_rewrite.c>
+RewriteEngine on
+
+RewriteRule ^login.html$ login.php [L]
+RewriteRule ^logout.html$ logout.php [L]
+RewriteRule ^home.html$ home.php [L]
+
+RewriteRule ^sk-(.*)-(.*)\.html$ tampilkan-sk-pdf.php?mdsekolah=$1&mdptk=$2 [L]
+RewriteRule ^detail-ptk-(.*)\.html$ aksi/lap-excel/excel_lap_detail_sekolah_ptk.php?idsekolah=$1 [L]
+
+</IfModule>
+
+# secure htaccess file
+<Files .htaccess>
+order allow,deny
+deny from all
+#allow from env=ajax
+</Files>
+
+options All -Indexes

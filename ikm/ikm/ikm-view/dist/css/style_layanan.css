@@ -1,0 +1,70 @@
+#loading {
+	position: fixed;
+	left: 0px;
+	top: 0px;
+	width: 100%;
+	height: 100%;
+	z-index: 9999;
+	background: url(loading.gif) 50% 50% no-repeat #ede9df;
+	background-color: #222;opacity:0.7;filter:alpha(opacity=70);
+}
+
+.table thead {
+	background-image: linear-gradient(#666, #222);
+	color:#fff;
+}
+
+.table tbody th,.table tbody td,.table tfoot th,.table tfoot td {
+    vertical-align: middle;
+	padding: 5px 8px 5px 8px;
+}
+
+.table tbody td {
+	background: #fff;
+	color:#000;
+}
+
+.table tbody th:first-child,.table tbody .th:first-child,.table tbody td:first-child,.table tfoot th:first-child,.table tfoot td:first-child {
+
+}
+
+.table tbody tr.even td {
+    background: #F5F5DC
+}
+
+.table tbody tr:hover th,.table tbody tr:hover .th,.table tbody tr:hover td {
+	background: #FFF4B5
+}
+
+/**** atur style modal boostrap ****/
+.modal-dialog{
+ 
+}
+
+.modal-header{
+    background-image: linear-gradient(#04acec, #0186ba);
+	background-image:url('mod-abu.png');
+	border-radius:3px 3px 0 0;
+	-moz-border-radius:5px 5px 0 0;	
+	border-bottom: none;
+}
+
+.modal-content{
+	
+}
+
+.modal-body{
+	font-size: 11.5px;font-family: "Tahoma", "Trebuchet MS", "Helvetica", "Verdana";
+}
+
+.modal-title{
+	font-size: 14px;font-family: "Arial", "Trebuchet MS", "Helvetica", "Verdana";
+	text-shadow: 0 2px 0 #000;
+	color: #a2a2a2;
+}
+.modal-footer{
+    background-color: #3498db;background-image:url('mod-diag-hitam.png');
+	border-top: none;
+	padding: 5px 8px 5px 8px;
+	height: 52px;
+}

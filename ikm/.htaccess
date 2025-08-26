@@ -1,0 +1,21 @@
+<IfModule mod_rewrite.c>
+RewriteEngine on
+
+RewriteRule ^admin-ikm.html$ ikm/home.php [L]
+RewriteRule ^home.html$ web-view.php [L]
+RewriteRule ^beranda.html$ web-view.php [L]
+RewriteRule ^kegiatan-sekolah.html$ kegiatan-sekolah.php [L]
+RewriteRule ^logout.html$ logout.php [L]
+
+RewriteRule ^tampilkan-(.*)\.html$ tampilkan-dokumen-pdf.php?idinformasi=$1 [L]
+
+</IfModule>
+
+# secure htaccess file
+<Files .htaccess>
+order allow,deny
+deny from all
+#allow from env=ajax
+</Files>
+
+options All -Indexes

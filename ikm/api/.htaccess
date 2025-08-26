@@ -1,0 +1,9 @@
+<IfModule mod_rewrite.c>
+RewriteEngine on
+
+#RewriteRule ^([a-zA-Z0-9\-]+)/?$ ambil_data.php [L]
+#RewriteRule ^ (.*)$ ambil_data.php [L]
+RewriteRule ^ambil.html$ ambil_data.php [L]
+
+</IfModule>
+options All -Indexes

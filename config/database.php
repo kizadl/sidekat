@@ -1,7 +1,7 @@
 <?php
-$host = "db_sidekat";
-$user = "admsidekat";
-$pass = "Wak1Lraky@tJBR";
+$host = "localhost";
+$user = "root";
+$pass = "";
 $db = "db_sidekat";
 
 $conn = new mysqli($host, $user, $pass, $db);

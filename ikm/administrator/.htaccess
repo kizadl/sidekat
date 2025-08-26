@@ -1,0 +1,25 @@
+<IfModule mod_rewrite.c>
+RewriteEngine on
+
+RewriteRule ^login.html$ login.php [L]
+RewriteRule ^logout.html$ logout.php [L]
+RewriteRule ^home.html$ home.php [L]
+
+RewriteRule ^excel-rekap-(.*)\.html$ aksi/lap-excel/excel_lap_media.php?filtermedia=$1 [L]
+
+RewriteRule ^excel-sarpras-baik-(.*)-(.*)-(.*)\.html$ aksi/lap-excel/excel_lap_sarpras_baik.php?ketwilayah=$1&idwilayah=$2&nmwilayah=$3 [L]
+RewriteRule ^excel-sarpras-ringan-(.*)-(.*)-(.*)\.html$ aksi/lap-excel/excel_lap_sarpras_ringan.php?ketwilayah=$1&idwilayah=$2&nmwilayah=$3 [L]
+RewriteRule ^excel-sarpras-sedang-(.*)-(.*)-(.*)\.html$ aksi/lap-excel/excel_lap_sarpras_sedang.php?ketwilayah=$1&idwilayah=$2&nmwilayah=$3 [L]
+RewriteRule ^excel-sarpras-berat-(.*)-(.*)-(.*)\.html$ aksi/lap-excel/excel_lap_sarpras_berat.php?ketwilayah=$1&idwilayah=$2&nmwilayah=$3 [L]
+
+RewriteRule ^tampilkan-(.*)\.html$ tampilkan-surat-pdf.php?npsn=$1 [L]
+</IfModule>
+
+# secure htaccess file
+<Files .htaccess>
+order allow,deny
+deny from all
+#allow from env=ajax
+</Files>
+
+options All -Indexes

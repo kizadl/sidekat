@@ -1,0 +1,87 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta name="google" content="notranslate"/>
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta http-equiv="x-ua-compatible" content="ie=edge">
+<link rel="icon" href="favicon.png">
+<title>IKM</title>
+<link rel="stylesheet" href="plugins/fontawesome-free/css/all.min.css">
+<link rel="stylesheet" href="dist/css/adminlte.min.css">	
+<link rel="stylesheet" type="text/css" href="dist/css/login.css">
+<script src="plugins/jquery/jquery.min.js"></script>
+</head>
+<body>
+<div class="container">
+	<div class="d-flex justify-content-center h-100">
+		<div class="card">
+			<div class="card-header" align="center">
+				<h5>Indeks Kepuasan Masyarakat</h5>				
+			</div>
+			<div id="loginMsg"></div>
+			<div class="card-body">
+				<form role="form" action="" method="post" name="loginFrm" id="loginFrm">
+					<div class="input-group form-group">
+						<div class="input-group-prepend">
+							<span class="input-group-text"><i class="fas fa-user"></i></span>
+						</div>
+						<input type="text" class="form-control" placeholder="username" autocomplete="off" id="txtusername" required autofocus >
+						
+					</div>
+					<div class="input-group form-group">
+						<div class="input-group-prepend">
+							<span class="input-group-text"><i class="fas fa-key"></i></span>
+						</div>
+						<input type="password" class="form-control" placeholder="password" autocomplete="off" id="txtpassword" required >
+					</div>
+					<div class="form-group">
+						<input type="submit" value="Login" class="btn float-right login_btn" id="cmdLogin">
+					</div>
+				</form>
+			</div>
+			<div class="card-footer">
+				<div class="d-flex justify-content-center links">
+				Dinas Kesehatan Kabupaten Jember
+				</div>
+			</div>
+		</div>
+	</div>
+</div>
+
+<script type="text/javascript" charset="utf-8">
+	$(document).ready(function(){
+			document.body.style.cursor = "default";	
+			$("#cmdLogin").removeAttr("disabled");			
+			$("#txtusername").val('');
+			$("#txtpassword").val('');
+	});	
+		$("#cmdLogin").click(function(){
+			$("#loginFrm").submit(function(e){return false;});
+			var name = $("#txtusername").val();
+			var nameLength = name.length;
+			var pw   = $("#txtpassword").val();
+			var pwLength = pw.length;	
+			if((nameLength && pwLength) >1){
+				$.ajax({
+					type:"POST",
+					url :"services/login_user.php",
+					data:{checkUser:'',uid:name,pwrd:pw},
+					beforeSend: function(e) {
+						$("#cmdLogin").attr("disabled","disabled");
+						document.body.style.cursor = "wait";
+					},										
+					success:function(html){
+						$("#loginMsg").html(html);
+						document.body.style.cursor = "default";	
+						$("#cmdLogin").removeAttr("disabled");								
+					},
+					error: function() {alert('Koneksi bermasalah periksa internet');
+						document.body.style.cursor = "default";	
+						$("#cmdLogin").removeAttr("disabled");
+					},							
+				});							
+			} 
+		});		
+</script>
+</body>
+</html>

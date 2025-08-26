@@ -1,0 +1,26 @@
+<?php
+error_reporting(0);
+include '../../../services/config.php';
+$dbconn = mysqli_connect($dbhost,$dbuser,$dbpass,$dbname)or die('Could not connect: '); 
+$iddesa= trim($_POST['iddesa']);
+
+$sqlx = ("SELECT DISTINCT (status_ats) AS nmbentuk FROM tbl_ats WHERE desa='".$iddesa."'");
+		
+$resultx = mysqli_query($dbconn,$sqlx);
+$data = array();
+while($t=mysqli_fetch_array($resultx)){		
+
+	$sqlcount = ("SELECT COUNT(id) as jumDetSekolah FROM tbl_ats WHERE status_ats = '".$t['nmbentuk']."' AND desa='".$iddesa."'");
+	$resultcount = mysqli_query($dbconn,$sqlcount);$s= mysqli_fetch_assoc($resultcount);
+	$totaldetail = $totaldetail + $s['jumDetSekolah'];
+
+	$row_array = array();
+	$row_array['nmbentuksekolah']=$t['nmbentuk'];
+	$row_array['jumDetSekolah']=$s['jumDetSekolah'];	
+	$row_array['totaldetail']=$totaldetail;
+	array_push($data,$row_array);
+}
+echo json_encode($data);
+$resultx->close();
+$dbconn->close();
+?>  
