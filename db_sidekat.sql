@@ -34,7 +34,7 @@ CREATE TABLE `admin`  (
 -- Records of admin
 -- ----------------------------
 INSERT INTO `admin` VALUES (1, 'admin', '7c6a180b36896a0a8c02787eeafb0e4c', 'Admin DPR', 'admin');
-INSERT INTO `admin` VALUES (2, 'admin', '6cb75f652a9b52798eb6cf2201057c73', 'Admin DPR', '');
+INSERT INTO `admin` VALUES (2, 'admin', '6cb75f652a9b52798eb6cf2201057c73', 'Admin DPR', 'admin');
 
 -- ----------------------------
 -- Table structure for kategori_instansi
