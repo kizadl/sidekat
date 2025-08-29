@@ -1,6 +1,6 @@
 <?php
 // Koneksi ke database
-include('./config/database.php');
+include './config/database.php';
 
 // Ambil kuota magang dari tabel pengaturan
 $query = "SELECT value FROM pengaturan WHERE key_name = 'kuota_magang'";
@@ -23,13 +23,13 @@ $sisa_kuota = $kuota_magang - $total_mahasiswa;
 
 // Tentukan pesan berdasarkan sisa kuota
 if ($sisa_kuota < 0) {
-    $status_kuota = "Slot Overload";
+    $status_kuota = 'Slot Overload';
 } elseif ($sisa_kuota === 0) {
-    $status_kuota = "Sudah Penuh";
+    $status_kuota = 'Sudah Penuh';
 } elseif ($sisa_kuota <= 10) {
-    $status_kuota = "Hampir Penuh";
+    $status_kuota = 'Hampir Penuh';
 } else {
-    $status_kuota = "Tersedia";
+    $status_kuota = 'Tersedia';
 }
 ?>
 
@@ -72,90 +72,34 @@ if ($sisa_kuota < 0) {
     <!-- Mouse cursor area end here -->
 
     <!-- Header area start here -->
-    <header class="header-area header-three-area">
-        <div class="container header__container">
-            <div class="header__main">
-                <a href="home.html" class="logo">
-                    <img src="assets/images/logo/logo_dnd_dark.png" alt="logo">
-                </a>
-                <div class="main-menu">
-                    <nav>
-                        <ul>
-                            <li><a href="#about-section">Tentang Kami</a></li>
-                            <li>
-                                <a href="#0">Layanan Pengajuan</a>
-                                <ul class="sub-menu">
-                                    <li>
-                                        <a href="magang.html">- Pengajuan Magang</a>
-                                    </li>
-                                    <li>
-                                        <a href="penelitian.html">- Pengajuan Penelitian</a>
-                                    </li>
-                                    <li>
-                                        <a href="studi_edukasi.html">- Pengajuan Studi Edukasi</a>
-                                    </li>
-                                    <li>
-                                        <a href="kunjungan_kerja.html">- Kunjungan Kerja</a>
-                                    </li>
-                                </ul>
-                            </li>
-                            <li>
-                                <a href="#0">Tracking Pengajuan</a>
-                                <ul class="sub-menu">
-                                    <li>
-                                        <a href="tracking_magang.html">- Pengajuan Magang</a>
-                                    </li>
-                                    <li>
-                                        <a href="tracking_penelitian.html">- Pengajuan Penelitian</a>
-                                    </li>
-                                    <li>
-                                        <a href="tracking_studi_edukasi.html">- Pengajuan Studi Edukasi</a>
-                                    </li>
-                                    <li>
-                                        <a href="tracking_kunjungan_kerja.html">- Kunjungan Kerja</a>
-                                    </li>
-                                </ul>
-                            </li>
-                            <li><a href="#">IKM</a></li>
-                        </ul>
-                    </nav>
-                </div>
-                <div class="d-none d-lg-inline-block">
-                    <a href="admin/login.html" class="btn-one">Login <i
-                            class="fa-regular fa-arrow-right-long"></i></a>
-                </div>
-                <div class="bars d-block d-lg-none">
-                    <i id="openButton" class="fa-solid fa-bars"></i>
-                </div>
-            </div>
-        </div>
-    </header>
+    <?php include 'layouts/header.php';?>
     <!-- Header area end here -->
 
     <!-- Sidebar area start here -->
     <div id="targetElement" class="sidebar-area sidebar__hide">
         <div class="sidebar__overlay"></div>
         <a href="home.html" class="logo mb-40">
-            <img src="assets/images/logo/logo.svg" alt="logo">
+            <img src="assets/images/logo/logo_dnd_dark.png" alt="logo">
         </a>
-        <div class="sidebar__search mb-30">
+        <!-- <div class="sidebar__search mb-30">
             <input type="text" placeholder="Search...">
             <i class="fa-regular fa-magnifying-glass"></i>
-        </div>
+            </div> -->
         <div class="mobile-menu overflow-hidden"></div>
-        <ul class="info pt-40">
+        <!-- <ul class="info pt-40">
             <li><i class="fa-solid primary-color fa-location-dot"></i> <a href="#0">example@example.com</a>
             </li>
-            <li class="py-2"><i class="fa-solid primary-color fa-phone-volume"></i> <a
-                    href="tel:+208-6666-0112">+208-6666-0112</a>
+            <li class="py-2"><i class="fa-solid primary-color fa-phone-volume"></i>
+                <a href="tel:+208-6666-0112">+208-6666-0112</a>
             </li>
             <li><i class="fa-solid primary-color fa-paper-plane"></i> <a href="#0">info@example.com</a></li>
-        </ul>
+        </ul> -->
         <div class="social-icon mt-20">
-            <a href="#0"><i class="fa-brands fa-facebook-f"></i></a>
-            <a href="#0"><i class="fa-brands fa-twitter"></i></a>
-            <a href="#0"><i class="fa-brands fa-linkedin-in"></i></a>
-            <a href="#0"><i class="fa-brands fa-youtube"></i></a>
+            <a href="https://api.whatsapp.com/send/?phone=%2B62895370111060&text&type=phone_number&app_absent=0"
+                target="blank"><i class="fa-brands fa-whatsapp"></i></a>
+            <a href="https://www.instagram.com/dprdjember/" target="blank"><i class="fa-brands fa-instagram"></i></a>
+            <a href="https://www.tiktok.com/@dprdjember" target="blank"><i class="fa-brands fa-tiktok"></i></a>
+            <a href="https://www.youtube.com/@dprdjember" target="blank"><i class="fa-brands fa-youtube"></i></a>
         </div>
         <button id="closeButton" class="text-white"><i class="fa-solid fa-xmark"></i></button>
     </div>
@@ -199,13 +143,17 @@ if ($sisa_kuota < 0) {
                                 Permohonan Mudah, Akses Cepat, Peluang Terbuka
                             </h2>
                             <p class="wow fadeInUp mt-20" data-wow-delay="400ms" data-wow-duration="1500ms">
-                                DND Sidekat adalah aplikasi praktis untuk mengajukan permohonan magang, penelitian, studi edukasi, dan kunjungan kerja dengan mudah dan cepat.
+                                DND Sidekat adalah aplikasi praktis untuk mengajukan permohonan magang, penelitian,
+                                studi edukasi, dan kunjungan kerja dengan mudah dan cepat.
                             </p>
-                            <div class="banner-three__info wow fadeInUp mt-50" data-wow-delay="600ms" data-wow-duration="1500ms">
-                                <a class="wow fadeInUp btn-one mt-0" data-delay="1s" href="#layanan">Layanan Kami <i class="fa-regular fa-arrow-right-long"></i></a>
-                                <a class="wow fadeInUp btn-one mt-0" data-delay="1s" href="#kuota-section">Cek Kuota Magang <i class="fa-regular fa-arrow-right-long"></i></a>
+                            <div class="banner-three__info wow fadeInUp mt-50" data-wow-delay="600ms"
+                                data-wow-duration="1500ms">
+                                <a class="wow fadeInUp btn-one mt-0" data-delay="1s" href="#layanan">Layanan Kami <i
+                                        class="fa-regular fa-arrow-right-long"></i></a>
+                                <a class="wow fadeInUp btn-one mt-0" data-delay="1s" href="#kuota-section">Cek Kuota
+                                    Magang <i class="fa-regular fa-arrow-right-long"></i></a>
                             </div>
-                            
+
                         </div>
                     </div>
                     <div class="col-lg-5 order-1 order-lg-2 wow fadeInLeft" data-wow-delay="200ms"
@@ -238,13 +186,21 @@ if ($sisa_kuota < 0) {
                                     <img class="me-1" src="assets/images/icon/section-title.png" alt="icon">
                                     Tentang D&D Sidekat
                                 </h5>
-                                <h2 class="wow fadeInUp" data-wow-delay="200ms" data-wow-duration="1500ms">Sekilas Tentang <br> D&D Sidekat</h2>
-                                <p class="wow fadeInUp" data-wow-delay="400ms" data-wow-duration="1500ms" style="text-align: justify;">DND Sidekat Kabupaten Jember adalah aplikasi inovatif yang 
-                                    memudahkan proses pengajuan permohonan magang, penelitian, studi edukasi, dan kunjungan kerja di berbagai instansi pemerintah dan 
-                                    pendidikan di Kabupaten Jember. Dengan DND Sidekat, pengguna dapat mengajukan permohonan secara digital, memantau status pengajuan, 
-                                    serta mendapatkan notifikasi langsung mengenai persetujuan atau penolakan permohonan mereka. Aplikasi ini hadir untuk mempercepat 
-                                    proses administrasi, mengurangi penggunaan kertas, dan menjadikan layanan publik lebih transparan serta efisien. Kini, warga Jember 
-                                    yang ingin mendapatkan pengalaman profesional maupun akademis dapat mengakses kesempatan tersebut dengan lebih mudah melalui DND Sidekat.</p>
+                                <h2 class="wow fadeInUp" data-wow-delay="200ms" data-wow-duration="1500ms">Sekilas
+                                    Tentang <br> D&D Sidekat</h2>
+                                <p class="wow fadeInUp" data-wow-delay="400ms" data-wow-duration="1500ms"
+                                    style="text-align: justify;">DND Sidekat Kabupaten Jember adalah aplikasi inovatif
+                                    yang
+                                    memudahkan proses pengajuan permohonan magang, penelitian, studi edukasi, dan
+                                    kunjungan kerja di berbagai instansi pemerintah dan
+                                    pendidikan di Kabupaten Jember. Dengan DND Sidekat, pengguna dapat mengajukan
+                                    permohonan secara digital, memantau status pengajuan,
+                                    serta mendapatkan notifikasi langsung mengenai persetujuan atau penolakan permohonan
+                                    mereka. Aplikasi ini hadir untuk mempercepat
+                                    proses administrasi, mengurangi penggunaan kertas, dan menjadikan layanan publik
+                                    lebih transparan serta efisien. Kini, warga Jember
+                                    yang ingin mendapatkan pengalaman profesional maupun akademis dapat mengakses
+                                    kesempatan tersebut dengan lebih mudah melalui DND Sidekat.</p>
                             </div>
 
                         </div>
@@ -253,7 +209,8 @@ if ($sisa_kuota < 0) {
                         <div class="faq__image about-three__image image wow fadeInRight" data-wow-delay="200ms"
                             data-wow-duration="1500ms">
                             <div class="about-three-dot">
-                                <img class="sway__animationX" src="assets/images/shape/about-three-dot.png" alt="shape">
+                                <img class="sway__animationX" src="assets/images/shape/about-three-dot.png"
+                                    alt="shape">
                             </div>
                             <div class="faq__line sway__animation">
                                 <img src="assets/images/shape/faq-line.png" alt="image">
@@ -263,13 +220,13 @@ if ($sisa_kuota < 0) {
                     </div>
                 </div>
             </div>
-        </section>  
-        
+        </section>
+
         <section class="counter-area" id="kuota-section">
             <div class="container">
                 <div class="counter__wrp gradient-bg">
                     <div class="counter__shape wow slideInRight" data-wow-delay="200ms" data-wow-duration="1500ms">
-                        
+
                     </div>
                     <div class="counter__item wow bounceInUp" data-wow-delay="00ms" data-wow-duration="1000ms">
                         <img src="assets/images/icon/infokuota1.png" alt="icon">
@@ -351,7 +308,8 @@ if ($sisa_kuota < 0) {
                             <div class="service-three__up-content text-center">
                                 <h4><a href="penelitian.html" class="text-white mb-15">Pengajuan Penelitian</a>
                                 </h4>
-                                <p class="text-white">Pengajuan penelitian yang dilakukan pada DPRD Kabupaten Jember</p>
+                                <p class="text-white">Pengajuan penelitian yang dilakukan pada DPRD Kabupaten Jember
+                                </p>
                                 <a class="mt-10 read-more-btn text-white" href="penelitian.html">Selengkapnya<i
                                         class="fa-regular fa-arrow-right-long text-white"></i></a>
                             </div>
@@ -389,7 +347,8 @@ if ($sisa_kuota < 0) {
                                 <h5>Kunjungan Kerja</h5>
                             </div>
                             <div class="service-three__up-content text-center">
-                                <h4><a href="kunjungan_kerja.html" class="text-white mb-15">Permohonan Kunjungan Kerja</a>
+                                <h4><a href="kunjungan_kerja.html" class="text-white mb-15">Permohonan Kunjungan
+                                        Kerja</a>
                                 </h4>
                                 <p class="text-white">Permohonan Kunjungan Kerja pada DPRD Kabupaten Jember</p>
                                 <a class="mt-10 read-more-btn text-white" href="kunjungan_kerja.html">Selengkapnya<i
@@ -457,14 +416,18 @@ if ($sisa_kuota < 0) {
                     <a href="home.html" class="logo mb-30">
                         <img src="assets/images/logo/logo_dnd_dark.png" alt="image">
                     </a>
-                    <p>DND Sidekat adalah aplikasi praktis untuk 
-                        mengajukan permohonan magang, penelitian, 
+                    <p>DND Sidekat adalah aplikasi praktis untuk
+                        mengajukan permohonan magang, penelitian,
                         studi edukasi, dan kunjungan kerja dengan mudah dan cepat.</p>
                     <div class="social-icon">
-                        <a href="https://api.whatsapp.com/send/?phone=%2B62895370111060&text&type=phone_number&app_absent=0" target="blank"><i class="fa-brands fa-whatsapp"></i></a>
-                        <a href="https://www.instagram.com/dprdjember/" target="blank"><i class="fa-brands fa-instagram"></i></a>
-                        <a href="https://www.tiktok.com/@dprdjember"  target="blank"><i class="fa-brands fa-tiktok"></i></a>
-                        <a href="https://www.youtube.com/@dprdjember" target="blank"><i class="fa-brands fa-youtube"></i></a>
+                        <a href="https://api.whatsapp.com/send/?phone=%2B62895370111060&text&type=phone_number&app_absent=0"
+                            target="blank"><i class="fa-brands fa-whatsapp"></i></a>
+                        <a href="https://www.instagram.com/dprdjember/" target="blank"><i
+                                class="fa-brands fa-instagram"></i></a>
+                        <a href="https://www.tiktok.com/@dprdjember" target="blank"><i
+                                class="fa-brands fa-tiktok"></i></a>
+                        <a href="https://www.youtube.com/@dprdjember" target="blank"><i
+                                class="fa-brands fa-youtube"></i></a>
                     </div>
                 </div>
                 <div class="footer__item item-mid wow fadeInUp" data-wow-delay="200ms" data-wow-duration="1500ms">
@@ -472,17 +435,17 @@ if ($sisa_kuota < 0) {
                     <ul>
                         <li><a href="magang.html"><i class="fa-regular fa-angles-right me-1"></i>
                                 Pengajuan Magang</a></li>
-                        <li><a href="penelitian.html"><i class="fa-regular fa-angles-right me-1"></i> 
+                        <li><a href="penelitian.html"><i class="fa-regular fa-angles-right me-1"></i>
                                 Pengajuan Penelitian</a>
                         </li>
-                        <li><a href="studi_edukasi.html"><i class="fa-regular fa-angles-right me-1"></i> 
+                        <li><a href="studi_edukasi.html"><i class="fa-regular fa-angles-right me-1"></i>
                                 Pengejauan Studi Edukasi</a>
                         </li>
                         <li><a href="kunjungan_kerja.html"><i class="fa-regular fa-angles-right me-1"></i>
                                 Permohonan Kunjungan Kerja</a></li>
                     </ul><br>
                 </div>
-               
+
                 <div class="footer__item item-big wow fadeInUp" data-wow-delay="600ms" data-wow-duration="1500ms">
                     <h3 class="footer-title">Contact Us</h3>
                     <p class="mb-10">Jl. Kalimantan No. 86 Jember (68121)</p>
@@ -514,7 +477,8 @@ if ($sisa_kuota < 0) {
             <div class="container">
                 <div
                     class="d-flex gap-1 flex-wrap align-items-center justify-content-md-between justify-content-center">
-                    <p class="wow fadeInDown" data-wow-delay="00ms" data-wow-duration="1500ms">&copy; All Copyright 2024
+                    <p class="wow fadeInDown" data-wow-delay="00ms" data-wow-duration="1500ms">&copy; All Copyright
+                        2024
                         by <a href="#0">DPRD Kabupaten Jember</a></p>
                 </div>
             </div>

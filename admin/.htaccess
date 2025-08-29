@@ -13,6 +13,10 @@ RewriteRule ^verifikasi_kunjungan_kerja.html$ ../admin/verifikasi_kunjungan_kerj
 RewriteRule ^kategori_instansi.html$ ../admin/kategori_instansi.php [L]
 RewriteRule ^dashboard.html$ ../admin/dashboard.php [L]
 RewriteRule ^pengaturan_kuota.html$ ../admin/pengaturan_kuota.php [L]
+RewriteRule ^ikm_pendidikan.html$ ../admin/ikm_pendidikan.php [L]
+RewriteRule ^ikm_pekerjaan.html$ ../admin/ikm_pekerjaan.php [L]
+RewriteRule ^ikm_unsur.html$ ../admin/ikm_unsur.php [L]
+RewriteRule ^ikm_soal.html$ ../admin/ikm_soal.php [L]
 
 
 

@@ -11,6 +11,7 @@ RewriteRule ^tracking_magang.html$ tracking_magang.php [L]
 RewriteRule ^tracking_penelitian.html$ tracking_penelitian.php [L]
 RewriteRule ^tracking_studi_edukasi.html$ tracking_studi_edukasi.php [L]
 RewriteRule ^tracking_kunjungan_kerja.html$ tracking_kunjungan_kerja.php [L]
+RewriteRule ^ikm_survei.html$ ikm_survei.php [L]
 
 
 </IfModule>

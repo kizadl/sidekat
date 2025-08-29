@@ -4,7 +4,7 @@ if (!isset($_SESSION['username'])) {
     header('Location: login.php');
     exit();
 }
-include('../config/database.php');
+include '../config/database.php';
 
 // Fungsi untuk menghitung total pengajuan dan status
 function getStatistics($conn, $table)
@@ -23,7 +23,7 @@ function getStatistics($conn, $table)
         'total' => $total,
         'pending' => $pending,
         'accepted' => $accepted,
-        'rejected' => $rejected
+        'rejected' => $rejected,
     ];
 }
 
@@ -74,6 +74,108 @@ function getMonthlyData($conn, $table)
 $totalKeseluruhan = $statisticsMagang['total'] + $statisticsPenelitian['total'] + $statisticsStudi['total'] + $statisticsKunjungan['total'];
 
 // Menutup koneksi database
+// Query statistik IKM 12 bulan terakhir untuk 4 kriteria
+
+// Generate 12 bulan terakhir
+$ikmLabels = [];
+$ikmJwb1 = [];
+$ikmJwb2 = [];
+$ikmJwb3 = [];
+$ikmJwb4 = [];
+$bulanMap = [];
+for ($i = 11; $i >= 0; $i--) {
+    $dt = new DateTime();
+    $dt->modify("-{$i} month");
+    $key = $dt->format('Y-m');
+    $ikmLabels[] = $dt->format('M Y');
+    $bulanMap[$key] = count($bulanMap);
+    $ikmJwb1[] = 0;
+    $ikmJwb2[] = 0;
+    $ikmJwb3[] = 0;
+    $ikmJwb4[] = 0;
+}
+
+$queryIKM = "
+    SELECT 
+        DATE_FORMAT(s.tanggal, '%Y-%m') AS bulan,
+        SUM(CASE WHEN d.jawaban = '1' THEN 1 ELSE 0 END) AS jwb1,
+        SUM(CASE WHEN d.jawaban = '2' THEN 1 ELSE 0 END) AS jwb2,
+        SUM(CASE WHEN d.jawaban = '3' THEN 1 ELSE 0 END) AS jwb3,
+        SUM(CASE WHEN d.jawaban = '4' THEN 1 ELSE 0 END) AS jwb4
+    FROM ikm_survei s
+    JOIN ikm_detail_survei d ON s.id = d.id_survei
+    WHERE s.tanggal >= DATE_FORMAT(DATE_SUB(NOW(), INTERVAL 11 MONTH), '%Y-%m-01')
+    GROUP BY bulan
+    ORDER BY bulan ASC
+    ";
+$resultIKM = $conn->query($queryIKM);
+while ($row = $resultIKM->fetch_assoc()) {
+    $idx = isset($bulanMap[$row['bulan']]) ? $bulanMap[$row['bulan']] : null;
+    if ($idx !== null) {
+        $ikmJwb1[$idx] = (int) $row['jwb1'];
+        $ikmJwb2[$idx] = (int) $row['jwb2'];
+        $ikmJwb3[$idx] = (int) $row['jwb3'];
+        $ikmJwb4[$idx] = (int) $row['jwb4'];
+    }
+}
+
+// Query untuk daftar pertanyaan IKM
+$queryDaftarSoal = "SELECT id, pertanyaan FROM ikm_soal ORDER BY id";
+$resultDaftarSoal = $conn->query($queryDaftarSoal);
+$daftarSoal = [];
+while ($row = $resultDaftarSoal->fetch_assoc()) {
+    $daftarSoal[] = $row;
+}
+
+// Query untuk rekapitulasi persentase jawaban
+$queryPerSoal = "
+    SELECT 
+        s.pertanyaan,
+        COUNT(d.id) as total_jawaban,
+        SUM(CASE WHEN d.jawaban = '1' THEN 1 ELSE 0 END) AS tidak_puas,
+        SUM(CASE WHEN d.jawaban = '2' THEN 1 ELSE 0 END) AS kurang_puas,
+        SUM(CASE WHEN d.jawaban = '3' THEN 1 ELSE 0 END) AS puas,
+        SUM(CASE WHEN d.jawaban = '4' THEN 1 ELSE 0 END) AS sangat_puas,
+        ROUND(SUM(CASE WHEN d.jawaban = '1' THEN 1 ELSE 0 END) / COUNT(d.id) * 100, 2) AS persen_tidak_puas,
+        ROUND(SUM(CASE WHEN d.jawaban = '2' THEN 1 ELSE 0 END) / COUNT(d.id) * 100, 2) AS persen_kurang_puas,
+        ROUND(SUM(CASE WHEN d.jawaban = '3' THEN 1 ELSE 0 END) / COUNT(d.id) * 100, 2) AS persen_puas,
+        ROUND(SUM(CASE WHEN d.jawaban = '4' THEN 1 ELSE 0 END) / COUNT(d.id) * 100, 2) AS persen_sangat_puas
+    FROM ikm_soal s
+    LEFT JOIN ikm_detail_survei d ON s.id = d.id_soal
+    LEFT JOIN ikm_survei surv ON d.id_survei = surv.id
+    WHERE surv.tanggal >= DATE_SUB(CURDATE(), INTERVAL 12 MONTH)
+    GROUP BY s.id, s.pertanyaan
+    ORDER BY s.id";
+
+$resultPerSoal = $conn->query($queryPerSoal);
+$rekapitulasiData = [];
+while ($row = $resultPerSoal->fetch_assoc()) {
+    $rekapitulasiData[] = $row;
+}
+
+// Query untuk detail survei per responden
+$queryDetailSurvei = "
+    SELECT 
+        s.nama,
+        s.umur,
+        s.kelamin,
+        p.nama,
+        pk.nama,
+        GROUP_CONCAT(ds.jawaban ORDER BY ds.id_soal) as jawaban_soal
+    FROM ikm_survei s
+    LEFT JOIN ikm_pendidikan p ON s.id_pendidikan = p.id
+    LEFT JOIN ikm_pekerjaan pk ON s.id_pekerjaan = pk.id
+    LEFT JOIN ikm_detail_survei ds ON s.id = ds.id_survei
+    WHERE s.tanggal >= DATE_SUB(CURDATE(), INTERVAL 12 MONTH)
+    GROUP BY s.id, s.nama, s.umur, s.kelamin, p.nama, pk.nama
+    ORDER BY s.tanggal DESC";
+
+$resultDetailSurvei = $conn->query($queryDetailSurvei);
+$detailSurveiData = [];
+while ($row = $resultDetailSurvei->fetch_assoc()) {
+    $detailSurveiData[] = $row;
+}
+
 $conn->close();
 ?>
 
@@ -81,236 +183,22 @@ $conn->close();
 <html lang="id">
 
 <head>
-    <meta charset="utf-8" />
-    <title>Datatables | Jidox - Material Design Admin & Dashboard Template</title>
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <meta content="A fully featured admin theme which can be used to build CRM, CMS, etc." name="description" />
-    <meta content="Coderthemes" name="author" />
-
-    <!-- App favicon -->
-    <link rel="shortcut icon" href="assets/images/favicon.ico">
-
-    <!-- Datatables css -->
-    <link href="assets/vendor/datatables.net-bs5/css/dataTables.bootstrap5.min.css" rel="stylesheet" type="text/css" />
-    <link href="assets/vendor/datatables.net-fixedcolumns-bs5/css/fixedColumns.bootstrap5.min.css" rel="stylesheet" type="text/css" />
-    <link href="assets/vendor/datatables.net-fixedheader-bs5/css/fixedHeader.bootstrap5.min.css" rel="stylesheet" type="text/css" />
-    <link href="assets/vendor/datatables.net-buttons-bs5/css/buttons.bootstrap5.min.css" rel="stylesheet" type="text/css" />
-    <link href="assets/vendor/datatables.net-select-bs5/css/select.bootstrap5.min.css" rel="stylesheet" type="text/css" />
-
-    <!-- Theme Config Js -->
-    <script src="assets/js/config.js"></script>
-
-    <!-- App css -->
-    <link href="assets/css/app.min.css" rel="stylesheet" type="text/css" id="app-style" />
-
-    <!-- Icons css -->
-    <link href="assets/css/icons.min.css" rel="stylesheet" type="text/css" />
-    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
-    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css">
-
-    <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.bundle.min.js"></script>
-    <style>
-        .dropdown-container {
-            display: none;
-        }
-    </style>
+    <?php
+    $title = 'Dashboard';
+    include 'layouts/head.php';
+    ?>
 </head>
 
 <body>
     <!-- Begin page -->
     <div class="wrapper">
 
-
         <!-- ========== Topbar Start ========== -->
-        <div class="navbar-custom">
-            <div class="topbar container-fluid">
-                <div class="d-flex align-items-center gap-lg-2 gap-1">
-
-                    <!-- Topbar Brand Logo -->
-                    <div class="logo-topbar">
-                        <!-- Logo light -->
-                        <a href="dashboard.html" class="logo-light">
-                            <span class="logo-lg">
-                                <img src="assets/images/logo_dnd.png" alt="logo">
-                            </span>
-                            <span class="logo-sm">
-                                <img src="assets/images/logo-sm.png" alt="small logo">
-                            </span>
-                        </a>
-
-                        <!-- Logo Dark -->
-                        <a href="dashboard.html" class="logo-dark">
-                            <span class="logo-lg">
-                                <img src="assets/images/logo_dnd.png" alt="dark logo">
-                            </span>
-                            <span class="logo-sm">
-                                <img src="assets/images/logo-sm.png" alt="small logo">
-                            </span>
-                        </a>
-                    </div>
-
-                    <!-- Sidebar Menu Toggle Button -->
-                    <!-- Horizontal Menu Toggle Button -->
-                    <button class="navbar-toggle" data-bs-toggle="collapse" data-bs-target="#topnav-menu-content">
-                        <div class="lines">
-                            <span></span>
-                            <span></span>
-                            <span></span>
-                        </div>
-                    </button>
-
-                    <!-- Topbar Search Form -->
-
-                </div>
-
-                <ul class="topbar-menu d-flex align-items-center gap-3">
-                    <li class="nav-item dropdown">
-                        <a class="nav-link dropdown-toggle" href="#" id="navbarDropdown" role="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
-                            <span class="account-user-avatar">
-                                <img src="assets/images/users/avatar-1.jpg" alt="user-image" width="32" class="rounded-circle">
-                            </span>
-
-                        </a>
-                        <div class="dropdown-menu dropdown-menu-right" aria-labelledby="navbarDropdown">
-                            
-                            <div class="dropdown-divider"></div>
-                            <a class="dropdown-item" href="logout.php">Logout</a> <!-- Link ke halaman logout -->
-                        </div>
-                    </li>
-                </ul>
-            </div>
-        </div>
+        <?php include 'layouts/navbar.php'; ?>
         <!-- ========== Topbar End ========== -->
 
         <!-- ========== Left Sidebar Start ========== -->
-        <div class="leftside-menu">
-
-            <!-- Brand Logo Light -->
-            <a href="dashboard.html" class="logo logo-light">
-                <span class="logo-lg">
-                    <img src="assets/images/logo_dnd.png" width="120px" alt="logo">
-                </span>
-                <span class="logo-sm">
-                    <img src="assets/images/logo-sm.png" alt="small logo">
-                </span>
-            </a>
-
-            <!-- Brand Logo Dark -->
-            <a href="dashboard.html" class="logo logo-dark">
-                <span class="logo-lg">
-                    <img src="assets/images/logo_dnd.png" alt="dark logo">
-                </span>
-                <span class="logo-sm">
-                    <img src="assets/images/logo-sm.png" alt="small logo">
-                </span>
-            </a>
-
-            <!-- Sidebar Hover Menu Toggle Button -->
-            <div class="button-sm-hover" data-bs-toggle="tooltip" data-bs-placement="right" title="Show Full Sidebar">
-                <i class="ri-checkbox-blank-circle-line align-middle"></i>
-            </div>
-
-            <!-- Full Sidebar Menu Close Button -->
-            <div class="button-close-fullsidebar">
-                <i class="ri-close-fill align-middle"></i>
-            </div>
-
-            <!-- Sidebar -left -->
-            <div class="h-100" id="leftside-menu-container" data-simplebar>
-                <!-- Leftbar User -->
-                <div class="leftbar-user p-1 text-white">
-                    <a class="d-flex align-items-center text-reset">
-                        <div class="flex-shrink-0 ms-2">
-                            <img src="assets/images/users/avatar-1.jpg" alt="user-image" height="42" class="rounded-circle shadow">
-                        </div>
-                        <div class="flex-grow-4 ms-3">
-                            <span class="fw-semibold fs-15 d-block"><?php echo $_SESSION['nama']; ?></span>
-                            <span class="fs-13"><?php echo $_SESSION['role']; ?></span>
-                        </div>
-                    </a>
-                </div>
-
-                <!--- Sidemenu -->
-                <ul class="side-nav">
-
-                    <li class="side-nav-title mt-1"> Dashboard</li>
-
-                    <li class="side-nav-item">
-                        <a href="dashboard.html" class="side-nav-link">
-                            <i class="ri-dashboard-2-fill"></i>
-                            <span> Dashboard </span>
-                        </a>
-                    </li>
-                    <li class="side-nav-title mt-2">Verifikasi Pengajuan</li>
-                    <li class="side-nav-item">
-                        <a href="verifikasi_magang.html" class="side-nav-link">
-                            <i class="ri-survey-fill"></i>
-                            <span>Pengajuan Magang </span>
-                        </a>
-                    </li>
-                    <li class="side-nav-item">
-                        <a href="verifikasi_penelitian.html" class="side-nav-link">
-                            <i class=" ri-microscope-fill"></i>
-                            <span>Pengajuan Penelitian </span>
-                        </a>
-                    </li>
-                    <li class="side-nav-item">
-                        <a href="verifikasi_studi_edukasi.html" class="side-nav-link">
-                            <i class=" ri-graduation-cap-fill"></i>
-                            <span>Pengajuan Studi Edukasi</span>
-                        </a>
-                    </li>
-                    <li class="side-nav-item">
-                        <a href="verifikasi_kunjungan_kerja.html" class="side-nav-link">
-                            <i class="ri-briefcase-5-fill"></i>
-                            <span>Kunjungan Kerja </span>
-                        </a>
-                    </li>
-                    <li class="side-nav-title mt-1">Kelola Arsip</li>
-                    <li class="side-nav-item">
-                        <a href="#" onclick="toggleDropdown()" class="side-nav-link">
-                            <i class="ri-mail-fill"></i>
-                            <span>Arsip</span>
-                            <span class="menu-arrow"></span>
-                        </a>
-                        <div class="dropdown-container" id="dropdownMenu">
-                        <ul class="side-nav-second-level">
-                                <li>
-                                    <a href="arsip_magang.html">Magang</a>
-                                </li>
-                                <li>
-                                    <a href="arsip_penelitian.html">Penelitian</a>
-                                </li>
-                                <li>
-                                    <a href="arsip_studi_edukasi.html">Studi Edukasi</a>
-                                </li>
-                                <li>
-                                    <a href="arsip_kunjungan_kerja.html">Kunjungan Kerja</a>
-                                </li>
-                            </ul>
-                        </div>
-                    </li>
-                    <li class="side-nav-title mt-1"> Master Data</li>
-                    <li class="side-nav-item">
-                        <a href="kategori_instansi.html" class="side-nav-link">
-                            <i class="ri-government-fill"></i>
-                            <span> Kategori Instansi </span>
-                        </a>
-                    </li>
-                    <li class="side-nav-item">
-                        <a href="pengaturan_kuota.html" class="side-nav-link">
-                            <i class="ri-team-fill"></i>
-                            <span> Kuota Magang</span>
-                        </a>
-                    </li>
-
-
-                </ul>
-                <!--- End Sidemenu -->
-
-                <div class="clearfix"></div>
-            </div>
-        </div>
+        <?php include 'layouts/sidebar.php'; ?>
         <!-- ========== Left Sidebar End ========== -->
 
         <!-- ============================================================== -->
@@ -327,7 +215,6 @@ $conn->close();
                     <!-- start page title -->
                     <!-- end page title -->
 
-
                     <div class="row">
                         <div class="col-12">
                             <div class="card text-bg-primary">
@@ -337,24 +224,32 @@ $conn->close();
                             </div> <!-- end card -->
                         </div>
                         <div class="col-sm-4">
-                            <div class="card widget-icon-box">
-                                <div class="card-body">
-                                    <div class="d-flex justify-content-between">
-                                        <div class="flex-grow-1 overflow-hidden">
-                                            <h3 class="text-muted text-uppercase fs-30 mt-2" title="Number of Customers">Total Pengajuan</h3>
-                                            <h1 class="my-5"><?= $totalKeseluruhan ?></h1>
+                            <div class="card widget-icon-box h-100">
+                                <div class="card-body d-flex flex-column">
+                                    <div class="d-flex justify-content-between h-100">
+                                        <div
+                                            class="flex-grow-1 overflow-hidden d-flex flex-column justify-content-between">
+                                            <h3 class="text-muted text-uppercase fs-30 mt-2"
+                                                title="Number of Customers">Total Pengajuan</h3>
+                                            <h1 class="mb-4 mt-3 text-center display-4"><?= $totalKeseluruhan ?></h1>
                                             <p class="mb-2">
-                                                <span class="badge bg-warning me-1"><i class="ri-arrow-up-line"></i>Pending</span>
-                                                <span class="me-2"><?= $statisticsMagang['pending'] + $statisticsPenelitian['pending'] + $statisticsStudi['pending'] + $statisticsKunjungan['pending'] ?></span>
-                                                <span class="badge bg-success me-1"><i class="ri-arrow-up-line"></i>Disetujui</span>
-                                                <span class="me-2"><?= $statisticsMagang['accepted'] + $statisticsPenelitian['accepted'] + $statisticsStudi['accepted'] + $statisticsKunjungan['accepted'] ?></span>
-                                                <span class="badge bg-danger me-1"><i class="ri-arrow-up-line"></i>Ditolak</span>
-                                                <span class="me-2"><?= $statisticsMagang['rejected'] + $statisticsPenelitian['rejected'] + $statisticsStudi['rejected'] + $statisticsKunjungan['rejected'] ?></span>
+                                                <span class="badge bg-warning me-1"><i
+                                                        class="ri-arrow-up-line"></i>Pending</span>
+                                                <span
+                                                    class="me-2"><?= $statisticsMagang['pending'] + $statisticsPenelitian['pending'] + $statisticsStudi['pending'] + $statisticsKunjungan['pending'] ?></span>
+                                                <span class="badge bg-success me-1"><i
+                                                        class="ri-arrow-up-line"></i>Disetujui</span>
+                                                <span
+                                                    class="me-2"><?= $statisticsMagang['accepted'] + $statisticsPenelitian['accepted'] + $statisticsStudi['accepted'] + $statisticsKunjungan['accepted'] ?></span>
+                                                <span class="badge bg-danger me-1"><i
+                                                        class="ri-arrow-up-line"></i>Ditolak</span>
+                                                <span
+                                                    class="me-2"><?= $statisticsMagang['rejected'] + $statisticsPenelitian['rejected'] + $statisticsStudi['rejected'] + $statisticsKunjungan['rejected'] ?></span>
                                             </p>
-
                                         </div>
                                         <div class="avatar-sm flex-shrink-0">
-                                            <span class="avatar-title text-bg-success rounded rounded-3 fs-3 widget-icon-box-avatar shadow">
+                                            <span
+                                                class="avatar-title text-bg-success rounded rounded-3 fs-3 widget-icon-box-avatar shadow">
                                                 <i class="ri-group-line"></i>
                                             </span>
                                         </div>
@@ -367,19 +262,24 @@ $conn->close();
                                 <div class="card-body">
                                     <div class="d-flex justify-content-between">
                                         <div class="flex-grow-1 overflow-hidden">
-                                            <h5 class="text-muted text-uppercase fs-20 mt-0" title="Number of Customers">Magang</h5>
+                                            <h5 class="text-muted text-uppercase fs-20 mt-0"
+                                                title="Number of Customers">Magang</h5>
                                             <h3 class="my-3"><?= $statisticsMagang['total'] ?></h3>
                                             <p class="mb-2">
-                                                <span class="badge bg-warning me-1"><i class="ri-arrow-up-line"></i>Pending</span>
+                                                <span class="badge bg-warning me-1"><i
+                                                        class="ri-arrow-up-line"></i>Pending</span>
                                                 <span class="me-2"><?= $statisticsMagang['pending'] ?></span>
-                                                <span class="badge bg-success me-1"><i class="ri-arrow-up-line"></i>Disetujui</span>
+                                                <span class="badge bg-success me-1"><i
+                                                        class="ri-arrow-up-line"></i>Disetujui</span>
                                                 <span class="me-2"><?= $statisticsMagang['accepted'] ?></span>
-                                                <span class="badge bg-danger me-1"><i class="ri-arrow-up-line"></i>Ditolak</span>
+                                                <span class="badge bg-danger me-1"><i
+                                                        class="ri-arrow-up-line"></i>Ditolak</span>
                                                 <span class="me-2"><?= $statisticsMagang['rejected'] ?></span>
                                             </p>
                                         </div>
                                         <div class="avatar-sm flex-shrink-0">
-                                            <span class="avatar-title text-bg-info rounded rounded-3 fs-3 widget-icon-box-avatar shadow">
+                                            <span
+                                                class="avatar-title text-bg-info rounded rounded-3 fs-3 widget-icon-box-avatar shadow">
                                                 <i class="ri-survey-fill"></i>
                                             </span>
                                         </div>
@@ -390,19 +290,24 @@ $conn->close();
                                 <div class="card-body">
                                     <div class="d-flex justify-content-between">
                                         <div class="flex-grow-1 overflow-hidden">
-                                            <h5 class="text-muted text-uppercase fs-20 mt-0" title="Number of Customers">Penelitian</h5>
+                                            <h5 class="text-muted text-uppercase fs-20 mt-0"
+                                                title="Number of Customers">Penelitian</h5>
                                             <h3 class="my-3"><?= $statisticsPenelitian['total'] ?></h3>
                                             <p class="mb-2">
-                                                <span class="badge bg-warning me-1"><i class="ri-arrow-up-line"></i>Pending</span>
+                                                <span class="badge bg-warning me-1"><i
+                                                        class="ri-arrow-up-line"></i>Pending</span>
                                                 <span class="me-2"><?= $statisticsPenelitian['pending'] ?></span>
-                                                <span class="badge bg-success me-1"><i class="ri-arrow-up-line"></i>Disetujui</span>
+                                                <span class="badge bg-success me-1"><i
+                                                        class="ri-arrow-up-line"></i>Disetujui</span>
                                                 <span class="me-2"><?= $statisticsPenelitian['accepted'] ?></span>
-                                                <span class="badge bg-danger me-1"><i class="ri-arrow-up-line"></i>Ditolak</span>
+                                                <span class="badge bg-danger me-1"><i
+                                                        class="ri-arrow-up-line"></i>Ditolak</span>
                                                 <span class="me-2"><?= $statisticsPenelitian['rejected'] ?></span>
                                             </p>
                                         </div>
                                         <div class="avatar-sm flex-shrink-0">
-                                            <span class="avatar-title text-bg-danger rounded rounded-3 fs-3 widget-icon-box-avatar shadow">
+                                            <span
+                                                class="avatar-title text-bg-danger rounded rounded-3 fs-3 widget-icon-box-avatar shadow">
                                                 <i class=" ri-microscope-fill"></i>
                                             </span>
                                         </div>
@@ -415,19 +320,24 @@ $conn->close();
                                 <div class="card-body">
                                     <div class="d-flex justify-content-between">
                                         <div class="flex-grow-1 overflow-hidden">
-                                            <h5 class="text-muted text-uppercase fs-20 mt-0" title="Number of Customers">Studi edukasi</h5>
+                                            <h5 class="text-muted text-uppercase fs-20 mt-0"
+                                                title="Number of Customers">Studi edukasi</h5>
                                             <h3 class="my-3"><?= $statisticsStudi['total'] ?></h3>
                                             <p class="mb-2">
-                                                <span class="badge bg-warning me-1"><i class="ri-arrow-up-line"></i>Pending</span>
+                                                <span class="badge bg-warning me-1"><i
+                                                        class="ri-arrow-up-line"></i>Pending</span>
                                                 <span class="me-2"><?= $statisticsStudi['pending'] ?></span>
-                                                <span class="badge bg-success me-1"><i class="ri-arrow-up-line"></i>Disetujui</span>
+                                                <span class="badge bg-success me-1"><i
+                                                        class="ri-arrow-up-line"></i>Disetujui</span>
                                                 <span class="me-2"><?= $statisticsStudi['accepted'] ?></span>
-                                                <span class="badge bg-danger me-1"><i class="ri-arrow-up-line"></i>Ditolak</span>
+                                                <span class="badge bg-danger me-1"><i
+                                                        class="ri-arrow-up-line"></i>Ditolak</span>
                                                 <span class="me-2"><?= $statisticsStudi['rejected'] ?></span>
                                             </p>
                                         </div>
                                         <div class="avatar-sm flex-shrink-0">
-                                            <span class="avatar-title text-bg-primary rounded rounded-3 fs-3 widget-icon-box-avatar shadow">
+                                            <span
+                                                class="avatar-title text-bg-primary rounded rounded-3 fs-3 widget-icon-box-avatar shadow">
                                                 <i class=" ri-graduation-cap-fill"></i>
                                             </span>
                                         </div>
@@ -438,19 +348,24 @@ $conn->close();
                                 <div class="card-body">
                                     <div class="d-flex justify-content-between">
                                         <div class="flex-grow-1 overflow-hidden">
-                                            <h5 class="text-muted text-uppercase fs-20 mt-0" title="Number of Customers">Kunjungan Kerja</h5>
+                                            <h5 class="text-muted text-uppercase fs-20 mt-0"
+                                                title="Number of Customers">Kunjungan Kerja</h5>
                                             <h3 class="my-3"><?= $statisticsKunjungan['total'] ?></h3>
                                             <p class="mb-2">
-                                                <span class="badge bg-warning me-1"><i class="ri-arrow-up-line"></i>Pending</span>
+                                                <span class="badge bg-warning me-1"><i
+                                                        class="ri-arrow-up-line"></i>Pending</span>
                                                 <span class="me-1"><?= $statisticsKunjungan['pending'] ?></span>
-                                                <span class="badge bg-success me-1"><i class="ri-arrow-up-line"></i>Disetujui</span>
+                                                <span class="badge bg-success me-1"><i
+                                                        class="ri-arrow-up-line"></i>Disetujui</span>
                                                 <span class="me-1"><?= $statisticsKunjungan['accepted'] ?></span>
-                                                <span class="badge bg-danger me-1"><i class="ri-arrow-up-line"></i>Ditolak</span>
+                                                <span class="badge bg-danger me-1"><i
+                                                        class="ri-arrow-up-line"></i>Ditolak</span>
                                                 <span><?= $statisticsKunjungan['rejected'] ?></span>
                                             </p>
                                         </div>
                                         <div class="avatar-sm flex-shrink-0">
-                                            <span class="avatar-title text-bg-warning rounded rounded-3 fs-3 widget-icon-box-avatar">
+                                            <span
+                                                class="avatar-title text-bg-warning rounded rounded-3 fs-3 widget-icon-box-avatar">
                                                 <i class="ri-briefcase-5-fill"></i>
                                             </span>
                                         </div>
@@ -459,7 +374,105 @@ $conn->close();
                             </div> <!-- end card-->
                         </div> <!-- end col-->
                     </div>
+                    <div class="row">
+                        <div class="col-12">
+                            <div class="card">
+                                <div class="card-body">
+                                    <h4 class="card-title">Statistik Survei IKM 12 Bulan Terakhir</h4>
+                                    <div id="ikmApexChart"></div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
 
+                    <!-- Tabel Rekapitulasi Jawaban IKM -->
+                    <div class="row">
+                        <div class="col-12">
+                            <div class="card">
+                                <div class="card-body">
+                                    <h4 class="card-title">Rekapitulasi Jawaban IKM 12 Bulan Terakhir</h4>
+                                    <div class="table-responsive">
+                                        <table class="table table-bordered table-centered mb-0">
+                                            <thead>
+                                                <tr>
+                                                    <th>Unsur Pelayanan</th>
+                                                    <th class="text-center text-danger">Tidak Puas</th>
+                                                    <th class="text-center text-warning">Kurang Puas</th>
+                                                    <th class="text-center text-success">Puas</th>
+                                                    <th class="text-center text-primary">Sangat Puas</th>
+                                                    <th class="text-center">Total</th>
+                                                </tr>
+                                            </thead>
+                                            <tbody>
+                                                <?php
+                                                foreach ($rekapitulasiData as $row) {
+                                                    echo '<tr>';
+                                                    echo "<td>{$row['pertanyaan']}</td>";
+                                                    echo "<td class='text-center text-danger'>{$row['persen_tidak_puas']}% <small class='text-muted'>({$row['tidak_puas']})</small></td>";
+                                                    echo "<td class='text-center text-warning'>{$row['persen_kurang_puas']}% <small class='text-muted'>({$row['kurang_puas']})</small></td>";
+                                                    echo "<td class='text-center text-success'>{$row['persen_puas']}% <small class='text-muted'>({$row['puas']})</small></td>";
+                                                    echo "<td class='text-center text-primary'>{$row['persen_sangat_puas']}% <small class='text-muted'>({$row['sangat_puas']})</small></td>";
+                                                    echo "<td class='text-center'>{$row['total_jawaban']}</td>";
+                                                    echo '</tr>';
+                                                }
+                                                ?>
+                                            </tbody>
+                                        </table>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Tabel Detail Survei IKM -->
+                    <div class="row">
+                        <div class="col-12">
+                            <div class="card">
+                                <div class="card-body">
+                                    <h4 class="card-title">Detail Survei IKM</h4>
+                                    <div class="table-responsive">
+                                        <table class="table table-bordered table-centered mb-0">
+                                            <thead>
+                                                <tr>
+                                                    <th>Nama</th>
+                                                    <th>Umur</th>
+                                                    <th>Kelamin</th>
+                                                    <th>Pendidikan</th>
+                                                    <th>Pekerjaan</th>
+                                                    <?php
+                                                    $i = 1;
+                                                    foreach ($daftarSoal as $soal) {
+                                                        echo "<th title='{$soal['pertanyaan']}'>U{$i}</th>";
+                                                        $i++;
+                                                    }
+                                                    ?>
+                                                </tr>
+                                            </thead>
+                                            <tbody>
+                                                <?php
+                                                foreach ($detailSurveiData as $row) {
+                                                    echo '<tr>';
+                                                    echo "<td>{$row['nama']}</td>";
+                                                    echo "<td>{$row['umur']}</td>";
+                                                    echo "<td>{$row['kelamin']}</td>";
+                                                    echo "<td>{$row['nama']}</td>";
+                                                    echo "<td>{$row['nama']}</td>";
+                                                    
+                                                    // Pisahkan jawaban menjadi array
+                                                    $jawaban = explode(',', $row['jawaban_soal']);
+                                                    foreach ($jawaban as $j) {
+                                                        echo "<td class='text-center'>{$j}</td>";
+                                                    }
+                                                    echo '</tr>';
+                                                }
+                                                ?>
+                                            </tbody>
+                                        </table>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
                 </div> <!-- content -->
 
 
@@ -485,7 +498,8 @@ $conn->close();
 
             </div>
             <!-- Modal untuk Lihat Alasan Penolakan -->
-            <div class="modal fade" id="modalAlasan" tabindex="-1" role="dialog" aria-labelledby="modalAlasanLabel" aria-hidden="true">
+            <div class="modal fade" id="modalAlasan" tabindex="-1" role="dialog"
+                aria-labelledby="modalAlasanLabel" aria-hidden="true">
                 <div class="modal-dialog" role="document">
                     <div class="modal-content">
                         <div class="modal-header">
@@ -505,7 +519,8 @@ $conn->close();
             </div>
 
             <!-- Modal untuk input alasan penolakan -->
-            <div class="modal fade" id="modalTolak" tabindex="-1" role="dialog" aria-labelledby="modalTolakLabel" aria-hidden="true">
+            <div class="modal fade" id="modalTolak" tabindex="-1" role="dialog" aria-labelledby="modalTolakLabel"
+                aria-hidden="true">
                 <div class="modal-dialog" role="document">
                     <div class="modal-content">
                         <form action="verifikasi_magang.php" method="POST">
@@ -524,7 +539,8 @@ $conn->close();
                             </div>
                             <div class="modal-footer">
                                 <button type="button" class="btn btn-secondary" data-dismiss="modal">Batal</button>
-                                <button type="submit" class="btn btn-danger" name="action" value="tolak">Tolak Pengajuan</button>
+                                <button type="submit" class="btn btn-danger" name="action" value="tolak">Tolak
+                                    Pengajuan</button>
                             </div>
                         </form>
                     </div>
@@ -533,7 +549,8 @@ $conn->close();
             <div class="offcanvas offcanvas-end" tabindex="-1" id="theme-settings-offcanvas">
                 <div class="d-flex align-items-center bg-primary p-3 offcanvas-header">
                     <h5 class="text-white m-0">Theme Settings</h5>
-                    <button type="button" class="btn-close btn-close-white ms-auto" data-bs-dismiss="offcanvas" aria-label="Close"></button>
+                    <button type="button" class="btn-close btn-close-white ms-auto" data-bs-dismiss="offcanvas"
+                        aria-label="Close"></button>
                 </div>
 
                 <div class="offcanvas-body p-0">
@@ -546,11 +563,13 @@ $conn->close();
                             <h5 class="mt-0 fs-16 fw-bold mb-3">Choose Layout</h5>
                             <div class="d-flex flex-column gap-2">
                                 <div class="form-check form-switch">
-                                    <input id="customizer-layout01" name="data-layout" type="checkbox" value="vertical" class="form-check-input">
+                                    <input id="customizer-layout01" name="data-layout" type="checkbox"
+                                        value="vertical" class="form-check-input">
                                     <label class="form-check-label" for="customizer-layout01">Vertical</label>
                                 </div>
                                 <div class="form-check form-switch">
-                                    <input id="customizer-layout02" name="data-layout" type="checkbox" value="horizontal" class="form-check-input">
+                                    <input id="customizer-layout02" name="data-layout" type="checkbox"
+                                        value="horizontal" class="form-check-input">
                                     <label class="form-check-label" for="customizer-layout02">Horizontal</label>
                                 </div>
                             </div>
@@ -559,12 +578,14 @@ $conn->close();
 
                             <div class="d-flex flex-column gap-2">
                                 <div class="form-check form-switch">
-                                    <input class="form-check-input" type="checkbox" name="data-bs-theme" id="layout-color-light" value="light">
+                                    <input class="form-check-input" type="checkbox" name="data-bs-theme"
+                                        id="layout-color-light" value="light">
                                     <label class="form-check-label" for="layout-color-light">Light</label>
                                 </div>
 
                                 <div class="form-check form-switch">
-                                    <input class="form-check-input" type="checkbox" name="data-bs-theme" id="layout-color-dark" value="dark">
+                                    <input class="form-check-input" type="checkbox" name="data-bs-theme"
+                                        id="layout-color-dark" value="dark">
                                     <label class="form-check-label" for="layout-color-dark">Dark</label>
                                 </div>
                             </div>
@@ -574,21 +595,25 @@ $conn->close();
 
                                 <div class="d-flex flex-column gap-2">
                                     <div class="form-check form-switch">
-                                        <input class="form-check-input" type="checkbox" name="data-layout-mode" id="layout-mode-fluid" value="fluid">
+                                        <input class="form-check-input" type="checkbox" name="data-layout-mode"
+                                            id="layout-mode-fluid" value="fluid">
                                         <label class="form-check-label" for="layout-mode-fluid">Fluid</label>
                                     </div>
 
                                     <div id="layout-boxed">
                                         <div class="form-check form-switch">
-                                            <input class="form-check-input" type="checkbox" name="data-layout-mode" id="layout-mode-boxed" value="boxed">
+                                            <input class="form-check-input" type="checkbox" name="data-layout-mode"
+                                                id="layout-mode-boxed" value="boxed">
                                             <label class="form-check-label" for="layout-mode-boxed">Boxed</label>
                                         </div>
                                     </div>
 
                                     <div id="layout-detached">
                                         <div class="form-check form-switch">
-                                            <input class="form-check-input" type="checkbox" name="data-layout-mode" id="data-layout-detached" value="detached">
-                                            <label class="form-check-label" for="data-layout-detached">Detached</label>
+                                            <input class="form-check-input" type="checkbox" name="data-layout-mode"
+                                                id="data-layout-detached" value="detached">
+                                            <label class="form-check-label"
+                                                for="data-layout-detached">Detached</label>
                                         </div>
                                     </div>
                                 </div>
@@ -598,17 +623,20 @@ $conn->close();
 
                             <div class="d-flex flex-column gap-2">
                                 <div class="form-check form-switch">
-                                    <input class="form-check-input" type="checkbox" name="data-topbar-color" id="topbar-color-light" value="light">
+                                    <input class="form-check-input" type="checkbox" name="data-topbar-color"
+                                        id="topbar-color-light" value="light">
                                     <label class="form-check-label" for="topbar-color-light">Light</label>
                                 </div>
 
                                 <div class="form-check form-switch">
-                                    <input class="form-check-input" type="checkbox" name="data-topbar-color" id="topbar-color-dark" value="dark">
+                                    <input class="form-check-input" type="checkbox" name="data-topbar-color"
+                                        id="topbar-color-dark" value="dark">
                                     <label class="form-check-label" for="topbar-color-dark">Dark</label>
                                 </div>
 
                                 <div class="form-check form-switch">
-                                    <input class="form-check-input" type="checkbox" name="data-topbar-color" id="topbar-color-brand" value="brand">
+                                    <input class="form-check-input" type="checkbox" name="data-topbar-color"
+                                        id="topbar-color-brand" value="brand">
                                     <label class="form-check-label" for="topbar-color-brand">Brand</label>
                                 </div>
                             </div>
@@ -618,16 +646,19 @@ $conn->close();
 
                                 <div class="d-flex flex-column gap-2">
                                     <div class="form-check form-switch">
-                                        <input class="form-check-input" type="checkbox" name="data-menu-color" id="leftbar-color-light" value="light">
+                                        <input class="form-check-input" type="checkbox" name="data-menu-color"
+                                            id="leftbar-color-light" value="light">
                                         <label class="form-check-label" for="leftbar-color-light">Light</label>
                                     </div>
 
                                     <div class="form-check form-switch">
-                                        <input class="form-check-input" type="checkbox" name="data-menu-color" id="leftbar-color-dark" value="dark">
+                                        <input class="form-check-input" type="checkbox" name="data-menu-color"
+                                            id="leftbar-color-dark" value="dark">
                                         <label class="form-check-label" for="leftbar-color-dark">Dark</label>
                                     </div>
                                     <div class="form-check form-switch">
-                                        <input class="form-check-input" type="checkbox" name="data-menu-color" id="leftbar-color-brand" value="brand">
+                                        <input class="form-check-input" type="checkbox" name="data-menu-color"
+                                            id="leftbar-color-brand" value="brand">
                                         <label class="form-check-label" for="leftbar-color-brand">Brand</label>
                                     </div>
                                 </div>
@@ -638,33 +669,41 @@ $conn->close();
 
                                 <div class="d-flex flex-column gap-2">
                                     <div class="form-check form-switch">
-                                        <input class="form-check-input" type="checkbox" name="data-sidenav-size" id="leftbar-size-default" value="default">
+                                        <input class="form-check-input" type="checkbox" name="data-sidenav-size"
+                                            id="leftbar-size-default" value="default">
                                         <label class="form-check-label" for="leftbar-size-default">Default</label>
                                     </div>
 
                                     <div class="form-check form-switch">
-                                        <input class="form-check-input" type="checkbox" name="data-sidenav-size" id="leftbar-size-compact" value="compact">
+                                        <input class="form-check-input" type="checkbox" name="data-sidenav-size"
+                                            id="leftbar-size-compact" value="compact">
                                         <label class="form-check-label" for="leftbar-size-compact">Compact</label>
                                     </div>
 
                                     <div class="form-check form-switch">
-                                        <input class="form-check-input" type="checkbox" name="data-sidenav-size" id="leftbar-size-small" value="condensed">
+                                        <input class="form-check-input" type="checkbox" name="data-sidenav-size"
+                                            id="leftbar-size-small" value="condensed">
                                         <label class="form-check-label" for="leftbar-size-small">Condensed</label>
                                     </div>
 
                                     <div class="form-check form-switch">
-                                        <input class="form-check-input" type="checkbox" name="data-sidenav-size" id="leftbar-size-small-hover" value="sm-hover">
-                                        <label class="form-check-label" for="leftbar-size-small-hover">Hover View</label>
+                                        <input class="form-check-input" type="checkbox" name="data-sidenav-size"
+                                            id="leftbar-size-small-hover" value="sm-hover">
+                                        <label class="form-check-label" for="leftbar-size-small-hover">Hover
+                                            View</label>
                                     </div>
 
                                     <div class="form-check form-switch">
-                                        <input class="form-check-input" type="checkbox" name="data-sidenav-size" id="leftbar-size-full" value="full">
+                                        <input class="form-check-input" type="checkbox" name="data-sidenav-size"
+                                            id="leftbar-size-full" value="full">
                                         <label class="form-check-label" for="leftbar-size-full">Full Layout</label>
                                     </div>
 
                                     <div class="form-check form-switch">
-                                        <input class="form-check-input" type="checkbox" name="data-sidenav-size" id="leftbar-size-fullscreen" value="fullscreen">
-                                        <label class="form-check-label" for="leftbar-size-fullscreen">Fullscreen Layout</label>
+                                        <input class="form-check-input" type="checkbox" name="data-sidenav-size"
+                                            id="leftbar-size-fullscreen" value="fullscreen">
+                                        <label class="form-check-label" for="leftbar-size-fullscreen">Fullscreen
+                                            Layout</label>
                                     </div>
                                 </div>
                             </div>
@@ -673,11 +712,14 @@ $conn->close();
                                 <h5 class="my-3 fs-16 fw-bold">Layout Position</h5>
 
                                 <div class="btn-group checkbox" role="group">
-                                    <input type="radio" class="btn-check" name="data-layout-position" id="layout-position-fixed" value="fixed">
+                                    <input type="radio" class="btn-check" name="data-layout-position"
+                                        id="layout-position-fixed" value="fixed">
                                     <label class="btn btn-soft-primary w-sm" for="layout-position-fixed">Fixed</label>
 
-                                    <input type="radio" class="btn-check" name="data-layout-position" id="layout-position-scrollable" value="scrollable">
-                                    <label class="btn btn-soft-primary w-sm ms-0" for="layout-position-scrollable">Scrollable</label>
+                                    <input type="radio" class="btn-check" name="data-layout-position"
+                                        id="layout-position-scrollable" value="scrollable">
+                                    <label class="btn btn-soft-primary w-sm ms-0"
+                                        for="layout-position-scrollable">Scrollable</label>
                                 </div>
                             </div>
 
@@ -685,7 +727,8 @@ $conn->close();
                                 <div class="d-flex justify-content-between align-items-center mt-3">
                                     <label class="fs-16 fw-bold m-0" for="sidebaruser-check">Sidebar User Info</label>
                                     <div class="form-check form-switch">
-                                        <input type="checkbox" class="form-check-input" name="sidebar-user" id="sidebaruser-check">
+                                        <input type="checkbox" class="form-check-input" name="sidebar-user"
+                                            id="sidebaruser-check">
                                     </div>
                                 </div>
                             </div>
@@ -705,199 +748,253 @@ $conn->close();
                     </div>
                 </div>
             </div>
+        </div>
+    </div>
 
+    <?php include 'layouts/script.php'; ?>
 
+    <!-- ApexCharts -->
+    <script src="assets/vendor/apexcharts/apexcharts.min.js"></script>
+    <script>
+        // Data IKM untuk chart
+        const ikmLabels = <?= json_encode($ikmLabels) ?>;
+        const ikmJwb1 = <?= json_encode($ikmJwb1) ?>;
+        const ikmJwb2 = <?= json_encode($ikmJwb2) ?>;
+        const ikmJwb3 = <?= json_encode($ikmJwb3) ?>;
+        const ikmJwb4 = <?= json_encode($ikmJwb4) ?>;
 
-
-            <!-- Datatables js -->
-            <script src="assets/vendor/datatables.net/js/jquery.dataTables.min.js"></script>
-            <script src="assets/vendor/datatables.net-bs5/js/dataTables.bootstrap5.min.js"></script>
-            <script src="assets/vendor/datatables.net-responsive/js/dataTables.responsive.min.js"></script>
-            <script src="assets/vendor/datatables.net-responsive-bs5/js/responsive.bootstrap5.min.js"></script>
-            <script src="assets/vendor/datatables.net-fixedcolumns-bs5/js/fixedColumns.bootstrap5.min.js"></script>
-            <script src="assets/vendor/datatables.net-fixedheader/js/dataTables.fixedHeader.min.js"></script>
-            <script src="assets/vendor/datatables.net-buttons/js/dataTables.buttons.min.js"></script>
-            <script src="assets/vendor/datatables.net-buttons-bs5/js/buttons.bootstrap5.min.js"></script>
-            <script src="assets/vendor/datatables.net-buttons/js/buttons.html5.min.js"></script>
-            <script src="assets/vendor/datatables.net-buttons/js/buttons.flash.min.js"></script>
-            <script src="assets/vendor/datatables.net-buttons/js/buttons.print.min.js"></script>
-            <script src="assets/vendor/datatables.net-keytable/js/dataTables.keyTable.min.js"></script>
-            <script src="assets/vendor/datatables.net-select/js/dataTables.select.min.js"></script>
-
-            <script>
-                const totalDiterima = <?= json_encode(array_column(array_merge($dataMagangDiterima, $dataPenelitianDiterima, $dataStudiDiterima, $dataKunjunganDiterima), 'total')) ?>;
-                const totalDitolak = <?= json_encode(array_column(array_merge($dataMagangDitolak, $dataPenelitianDitolak, $dataStudiDitolak, $dataKunjunganDitolak), 'total')) ?>;
-                const labelsTotal = <?= json_encode(array_unique(array_merge(array_column($dataMagangDiterima, 'bulan'), array_column($dataMagangDitolak, 'bulan')))) ?>;
-
-                const magangDiterima = <?= json_encode(array_column($dataMagangDiterima, 'total')) ?>;
-                const magangDitolak = <?= json_encode(array_column($dataMagangDitolak, 'total')) ?>;
-                const labelsMagang = <?= json_encode(array_unique(array_merge(array_column($dataMagangDiterima, 'bulan'), array_column($dataMagangDitolak, 'bulan')))) ?>;
-
-                const penelitianDiterima = <?= json_encode(array_column($dataPenelitianDiterima, 'total')) ?>;
-                const penelitianDitolak = <?= json_encode(array_column($dataPenelitianDitolak, 'total')) ?>;
-                const labelsPenelitian = <?= json_encode(array_unique(array_merge(array_column($dataPenelitianDiterima, 'bulan'), array_column($dataPenelitianDitolak, 'bulan')))) ?>;
-
-                const studiDiterima = <?= json_encode(array_column($dataStudiDiterima, 'total')) ?>;
-                const studiDitolak = <?= json_encode(array_column($dataStudiDitolak, 'total')) ?>;
-                const labelsStudi = <?= json_encode(array_unique(array_merge(array_column($dataStudiDiterima, 'bulan'), array_column($dataStudiDitolak, 'bulan')))) ?>;
-
-                const kunjunganDiterima = <?= json_encode(array_column($dataKunjunganDiterima, 'total')) ?>;
-                const kunjunganDitolak = <?= json_encode(array_column($dataKunjunganDitolak, 'total')) ?>;
-                const labelsKunjungan = <?= json_encode(array_unique(array_merge(array_column($dataKunjunganDiterima, 'bulan'), array_column($dataKunjunganDitolak, 'bulan')))) ?>;
-
-                // Create bar chart for Total Pengajuan
-                const totalChartCtx = document.getElementById('totalPengajuanChart').getContext('2d');
-                const totalChart = new Chart(totalChartCtx, {
-                    type: 'bar',
-                    data: {
-                        labels: labelsTotal,
-                        datasets: [{
-                                label: 'Diterima',
-                                data: totalDiterima,
-                                backgroundColor: 'rgba(75, 192, 192, 0.6)',
-                            },
-                            {
-                                label: 'Ditolak',
-                                data: totalDitolak,
-                                backgroundColor: 'rgba(255, 99, 132, 0.6)',
-                            }
-                        ]
-                    },
-                    options: {
-                        responsive: true,
-                        scales: {
-                            y: {
-                                beginAtZero: true
-                            }
-                        }
+        var options = {
+            chart: {
+                type: 'line',
+                height: 350,
+                toolbar: {
+                    show: false
+                },
+                zoom: {
+                    enabled: false
+                }
+            },
+            series: [{
+                    name: 'Tidak Puas',
+                    data: ikmJwb1,
+                    color: '#dc3545',
+                },
+                {
+                    name: 'Kurang Puas',
+                    data: ikmJwb2,
+                    color: '#fd7e14',
+                },
+                {
+                    name: 'Puas',
+                    data: ikmJwb3,
+                    color: '#198754',
+                },
+                {
+                    name: 'Sangat Puas',
+                    data: ikmJwb4,
+                    color: '#0d6efd',
+                }
+            ],
+            xaxis: {
+                categories: ikmLabels,
+                title: {
+                    text: 'Bulan'
+                }
+            },
+            yaxis: {
+                title: {
+                    text: 'Jumlah Jawaban'
+                },
+                min: 0,
+                tickAmount: undefined,
+                forceNiceScale: true,
+                labels: {
+                    formatter: function(val) {
+                        return Math.round(val);
                     }
-                });
+                },
+                stepSize: 1
+            },
+            dataLabels: {
+                enabled: true
+            },
+            stroke: {
+                curve: 'smooth'
+            },
+            legend: {
+                position: 'top',
+                horizontalAlign: 'right',
+            }
+        };
+        var chart = new ApexCharts(document.querySelector("#ikmApexChart"), options);
+        chart.render();
+        const totalDiterima =
+            <?= json_encode(array_column(array_merge($dataMagangDiterima, $dataPenelitianDiterima, $dataStudiDiterima, $dataKunjunganDiterima), 'total')) ?>;
+        const totalDitolak =
+            <?= json_encode(array_column(array_merge($dataMagangDitolak, $dataPenelitianDitolak, $dataStudiDitolak, $dataKunjunganDitolak), 'total')) ?>;
+        const labelsTotal =
+            <?= json_encode(array_unique(array_merge(array_column($dataMagangDiterima, 'bulan'), array_column($dataMagangDitolak, 'bulan')))) ?>;
 
-                // Create bar chart for Pengajuan Magang
-                const magangChartCtx = document.getElementById('magangChart').getContext('2d');
-                const magangChart = new Chart(magangChartCtx, {
-                    type: 'bar',
-                    data: {
-                        labels: labelsMagang,
-                        datasets: [{
-                                label: 'Diterima',
-                                data: magangDiterima,
-                                backgroundColor: 'rgba(75, 192, 192, 0.6)',
-                            },
-                            {
-                                label: 'Ditolak',
-                                data: magangDitolak,
-                                backgroundColor: 'rgba(255, 99, 132, 0.6)',
-                            }
-                        ]
-                    },
-                    options: {
-                        responsive: true,
-                        scales: {
-                            y: {
-                                beginAtZero: true
-                            }
-                        }
-                    }
-                });
+        const magangDiterima = <?= json_encode(array_column($dataMagangDiterima, 'total')) ?>;
+        const magangDitolak = <?= json_encode(array_column($dataMagangDitolak, 'total')) ?>;
+        const labelsMagang =
+            <?= json_encode(array_unique(array_merge(array_column($dataMagangDiterima, 'bulan'), array_column($dataMagangDitolak, 'bulan')))) ?>;
 
-                // Create bar chart for Pengajuan Penelitian
-                const penelitianChartCtx = document.getElementById('penelitianChart').getContext('2d');
-                const penelitianChart = new Chart(penelitianChartCtx, {
-                    type: 'bar',
-                    data: {
-                        labels: labelsPenelitian,
-                        datasets: [{
-                                label: 'Diterima',
-                                data: penelitianDiterima,
-                                backgroundColor: 'rgba(75, 192, 192, 0.6)',
-                            },
-                            {
-                                label: 'Ditolak',
-                                data: penelitianDitolak,
-                                backgroundColor: 'rgba(255, 99, 132, 0.6)',
-                            }
-                        ]
-                    },
-                    options: {
-                        responsive: true,
-                        scales: {
-                            y: {
-                                beginAtZero: true
-                            }
-                        }
-                    }
-                });
+        const penelitianDiterima = <?= json_encode(array_column($dataPenelitianDiterima, 'total')) ?>;
+        const penelitianDitolak = <?= json_encode(array_column($dataPenelitianDitolak, 'total')) ?>;
+        const labelsPenelitian =
+            <?= json_encode(array_unique(array_merge(array_column($dataPenelitianDiterima, 'bulan'), array_column($dataPenelitianDitolak, 'bulan')))) ?>;
 
-                // Create bar chart for Pengajuan Studi Edukasi
-                const studiChartCtx = document.getElementById('studiChart').getContext('2d');
-                const studiChart = new Chart(studiChartCtx, {
-                    type: 'bar',
-                    data: {
-                        labels: labelsStudi,
-                        datasets: [{
-                                label: 'Diterima',
-                                data: studiDiterima,
-                                backgroundColor: 'rgba(75, 192, 192, 0.6)',
-                            },
-                            {
-                                label: 'Ditolak',
-                                data: studiDitolak,
-                                backgroundColor: 'rgba(255, 99, 132, 0.6)',
-                            }
-                        ]
-                    },
-                    options: {
-                        responsive: true,
-                        scales: {
-                            y: {
-                                beginAtZero: true
-                            }
-                        }
-                    }
-                });
+        const studiDiterima = <?= json_encode(array_column($dataStudiDiterima, 'total')) ?>;
+        const studiDitolak = <?= json_encode(array_column($dataStudiDitolak, 'total')) ?>;
+        const labelsStudi =
+            <?= json_encode(array_unique(array_merge(array_column($dataStudiDiterima, 'bulan'), array_column($dataStudiDitolak, 'bulan')))) ?>;
 
-                // Create bar chart for Permohonan Kunjungan Kerja
-                const kunjunganChartCtx = document.getElementById('kunjunganChart').getContext('2d');
-                const kunjunganChart = new Chart(kunjunganChartCtx, {
-                    type: 'bar',
-                    data: {
-                        labels: labelsKunjungan,
-                        datasets: [{
-                                label: 'Diterima',
-                                data: kunjunganDiterima,
-                                backgroundColor: 'rgba(75, 192, 192, 0.6)',
-                            },
-                            {
-                                label: 'Ditolak',
-                                data: kunjunganDitolak,
-                                backgroundColor: 'rgba(255, 99, 132, 0.6)',
-                            }
-                        ]
+        const kunjunganDiterima = <?= json_encode(array_column($dataKunjunganDiterima, 'total')) ?>;
+        const kunjunganDitolak = <?= json_encode(array_column($dataKunjunganDitolak, 'total')) ?>;
+        const labelsKunjungan =
+            <?= json_encode(array_unique(array_merge(array_column($dataKunjunganDiterima, 'bulan'), array_column($dataKunjunganDitolak, 'bulan')))) ?>;
+
+        // Create bar chart for Total Pengajuan
+        const totalChartCtx = document.getElementById('totalPengajuanChart').getContext('2d');
+        const totalChart = new Chart(totalChartCtx, {
+            type: 'bar',
+            data: {
+                labels: labelsTotal,
+                datasets: [{
+                        label: 'Diterima',
+                        data: totalDiterima,
+                        backgroundColor: 'rgba(75, 192, 192, 0.6)',
                     },
-                    options: {
-                        responsive: true,
-                        scales: {
-                            y: {
-                                beginAtZero: true
-                            }
-                        }
+                    {
+                        label: 'Ditolak',
+                        data: totalDitolak,
+                        backgroundColor: 'rgba(255, 99, 132, 0.6)',
                     }
-                });
-            </script>
-                        <script>
-                // JavaScript untuk toggle dropdown
-                function toggleDropdown() {
-                    var dropdown = document.getElementById("dropdownMenu");
-                    if (dropdown.style.display === "block") {
-                        dropdown.style.display = "none";
-                    } else {
-                        dropdown.style.display = "block";
+                ]
+            },
+            options: {
+                responsive: true,
+                scales: {
+                    y: {
+                        beginAtZero: true
                     }
                 }
-            </script>
+            }
+        });
 
+        // Create bar chart for Pengajuan Magang
+        const magangChartCtx = document.getElementById('magangChart').getContext('2d');
+        const magangChart = new Chart(magangChartCtx, {
+            type: 'bar',
+            data: {
+                labels: labelsMagang,
+                datasets: [{
+                        label: 'Diterima',
+                        data: magangDiterima,
+                        backgroundColor: 'rgba(75, 192, 192, 0.6)',
+                    },
+                    {
+                        label: 'Ditolak',
+                        data: magangDitolak,
+                        backgroundColor: 'rgba(255, 99, 132, 0.6)',
+                    }
+                ]
+            },
+            options: {
+                responsive: true,
+                scales: {
+                    y: {
+                        beginAtZero: true
+                    }
+                }
+            }
+        });
 
+        // Create bar chart for Pengajuan Penelitian
+        const penelitianChartCtx = document.getElementById('penelitianChart').getContext('2d');
+        const penelitianChart = new Chart(penelitianChartCtx, {
+            type: 'bar',
+            data: {
+                labels: labelsPenelitian,
+                datasets: [{
+                        label: 'Diterima',
+                        data: penelitianDiterima,
+                        backgroundColor: 'rgba(75, 192, 192, 0.6)',
+                    },
+                    {
+                        label: 'Ditolak',
+                        data: penelitianDitolak,
+                        backgroundColor: 'rgba(255, 99, 132, 0.6)',
+                    }
+                ]
+            },
+            options: {
+                responsive: true,
+                scales: {
+                    y: {
+                        beginAtZero: true
+                    }
+                }
+            }
+        });
+
+        // Create bar chart for Pengajuan Studi Edukasi
+        const studiChartCtx = document.getElementById('studiChart').getContext('2d');
+        const studiChart = new Chart(studiChartCtx, {
+            type: 'bar',
+            data: {
+                labels: labelsStudi,
+                datasets: [{
+                        label: 'Diterima',
+                        data: studiDiterima,
+                        backgroundColor: 'rgba(75, 192, 192, 0.6)',
+                    },
+                    {
+                        label: 'Ditolak',
+                        data: studiDitolak,
+                        backgroundColor: 'rgba(255, 99, 132, 0.6)',
+                    }
+                ]
+            },
+            options: {
+                responsive: true,
+                scales: {
+                    y: {
+                        beginAtZero: true
+                    }
+                }
+            }
+        });
+
+        // Create bar chart for Permohonan Kunjungan Kerja
+        const kunjunganChartCtx = document.getElementById('kunjunganChart').getContext('2d');
+        const kunjunganChart = new Chart(kunjunganChartCtx, {
+            type: 'bar',
+            data: {
+                labels: labelsKunjungan,
+                datasets: [{
+                        label: 'Diterima',
+                        data: kunjunganDiterima,
+                        backgroundColor: 'rgba(75, 192, 192, 0.6)',
+                    },
+                    {
+                        label: 'Ditolak',
+                        data: kunjunganDitolak,
+                        backgroundColor: 'rgba(255, 99, 132, 0.6)',
+                    }
+                ]
+            },
+            options: {
+                responsive: true,
+                scales: {
+                    y: {
+                        beginAtZero: true
+                    }
+                }
+            }
+        });
+    </script>
 </body>
 
 </html>
