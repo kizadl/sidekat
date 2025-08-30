@@ -135,7 +135,7 @@ $result = $conn->query($query);
                                 <div class="card-body">
                                     <h2>Data Pengajuan Studi Edukasi</h2>
                                     <p class="text-muted fs-14">
-                                        Berikut merupakan list data pengajuan magang, berikut panduan button dan
+                                        Berikut merupakan list data pengajuan studi edukasi, berikut panduan button dan
                                         fungsinya yang ada pada tabel data.
                                         Untuk <b><i>Melihat dokumen</i></b> silahkan klik icon <i
                                             class="ri-file-text-line"></i>.
