@@ -262,7 +262,7 @@ if (isset($_POST['submit'])) {
                                                 </div>
                                                 
                                                 <div class="col-6 mb-3">
-                                                    <label for="id_pendidikan">Pendidikan *</label>
+                                                    <label for="id_pendidikan">Pendidikan Terakhir*</label>
                                                     <select name="id_pendidikan" id="id_pendidikan" class="form-control bg-transparent bor" required>
                                                         <option value="">-- Pilih Pendidikan --</option>
                                                         <?php while($row = $result_pendidikan->fetch_assoc()): ?>

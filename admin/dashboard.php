@@ -156,11 +156,11 @@ while ($row = $resultPerSoal->fetch_assoc()) {
 // Query untuk detail survei per responden
 $queryDetailSurvei = "
     SELECT 
-        s.nama,
+        s.nama AS nama_responden,
         s.umur,
         s.kelamin,
-        p.nama,
-        pk.nama,
+        p.nama AS nama_pendidikan,
+        pk.nama AS nama_pekerjaan,
         GROUP_CONCAT(ds.jawaban ORDER BY ds.id_soal) as jawaban_soal
     FROM ikm_survei s
     LEFT JOIN ikm_pendidikan p ON s.id_pendidikan = p.id
@@ -223,6 +223,7 @@ $conn->close();
                                 </div> <!-- end card body-->
                             </div> <!-- end card -->
                         </div>
+                        
                         <div class="col-sm-4">
                             <div class="card widget-icon-box h-100">
                                 <div class="card-body d-flex flex-column">
@@ -452,11 +453,11 @@ $conn->close();
                                                 <?php
                                                 foreach ($detailSurveiData as $row) {
                                                     echo '<tr>';
-                                                    echo "<td>{$row['nama']}</td>";
+                                                    echo "<td>{$row['nama_responden']}</td>";
                                                     echo "<td>{$row['umur']}</td>";
                                                     echo "<td>{$row['kelamin']}</td>";
-                                                    echo "<td>{$row['nama']}</td>";
-                                                    echo "<td>{$row['nama']}</td>";
+                                                    echo "<td>{$row['nama_pendidikan']}</td>";
+                                                    echo "<td>{$row['nama_pekerjaan']}</td>";
                                                     
                                                     // Pisahkan jawaban menjadi array
                                                     $jawaban = explode(',', $row['jawaban_soal']);
