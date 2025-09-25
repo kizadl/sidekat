@@ -223,7 +223,7 @@ $conn->close();
                                 </div> <!-- end card body-->
                             </div> <!-- end card -->
                         </div>
-                        
+
                         <div class="col-sm-4">
                             <div class="card widget-icon-box h-100">
                                 <div class="card-body d-flex flex-column">
@@ -431,8 +431,9 @@ $conn->close();
                             <div class="card">
                                 <div class="card-body">
                                     <h4 class="card-title">Detail Survei IKM</h4>
-                                    <div class="table-responsive">
-                                        <table class="table table-bordered table-centered mb-0">
+                                    <div class="table-responsive"> <!-- Added div for responsiveness -->
+                                        <table id="mytable" class="table table-striped w-100 nowrap"
+                                            style="text-align: center;">
                                             <thead>
                                                 <tr>
                                                     <th>Nama</th>
@@ -458,7 +459,7 @@ $conn->close();
                                                     echo "<td>{$row['kelamin']}</td>";
                                                     echo "<td>{$row['nama_pendidikan']}</td>";
                                                     echo "<td>{$row['nama_pekerjaan']}</td>";
-                                                    
+
                                                     // Pisahkan jawaban menjadi array
                                                     $jawaban = explode(',', $row['jawaban_soal']);
                                                     foreach ($jawaban as $j) {
@@ -994,6 +995,23 @@ $conn->close();
                     }
                 }
             }
+        });
+    </script>
+    <script>
+        $(document).ready(function() {
+            $('#mytable').DataTable({
+                "scrollX": true,
+                "paging": true,
+                "searching": true,
+                "ordering": true,
+                "language": {
+                    "search": "Cari:",
+                    "paginate": {
+                        "next": "Berikutnya",
+                        "previous": "Sebelumnya"
+                    }
+                }
+            });
         });
     </script>
 </body>

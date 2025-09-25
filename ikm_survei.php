@@ -21,7 +21,7 @@ if (isset($_POST['submit'])) {
     $id_pendidikan = mysqli_real_escape_string($conn, $_POST['id_pendidikan']);
     $id_pekerjaan = mysqli_real_escape_string($conn, $_POST['id_pekerjaan']);
     $tanggal = date('Y-m-d H:i:s');
-    
+
     // Cek jika form data diri diisi
     if ($nama && $umur && $kelamin && $id_pendidikan && $id_pekerjaan) {
         // Mulai transaction
@@ -64,6 +64,7 @@ if (isset($_POST['submit'])) {
 ?>
 <!DOCTYPE html>
 <html>
+
 <head>
     <meta charset="UTF-8">
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
@@ -87,7 +88,7 @@ if (isset($_POST['submit'])) {
     <link rel="stylesheet" href="assets/css/nice-select.css">
     <!-- Style css -->
     <link rel="stylesheet" href="assets/css/style.css">
-    
+
     <style>
         .nav-tabs .nav-link {
             background-color: #f8f9fa;
@@ -95,33 +96,40 @@ if (isset($_POST['submit'])) {
             border: 1px solid #dee2e6;
             margin-right: 5px;
         }
+
         .nav-tabs .nav-link.active {
             background-color: #007bff;
             color: white;
             border-color: #007bff;
         }
+
         .nav-tabs .nav-link.disabled {
             background-color: #e9ecef;
             color: #6c757d;
         }
+
         .tab-content {
             padding: 30px;
             border: 1px solid #dee2e6;
             border-top: none;
             background-color: #fff;
         }
+
         .survei-question {
             background-color: #f8f9fa;
             padding: 15px;
             margin-bottom: 20px;
             border-radius: 5px;
         }
+
         .btn-nav {
             margin-top: 20px;
         }
+
         .btn-group {
             gap: 10px;
         }
+
         .btn-group .btn {
             flex: 1;
             padding: 15px 10px;
@@ -129,40 +137,46 @@ if (isset($_POST['submit'])) {
             border-radius: 10px !important;
             transition: all 0.3s ease;
         }
+
         .btn-group .btn i {
             font-size: 24px;
             margin-bottom: 5px;
         }
-        .btn-check:checked + .btn-outline-danger {
+
+        .btn-check:checked+.btn-outline-danger {
             background-color: #dc3545;
             border-color: #dc3545;
             color: white;
         }
-        .btn-check:checked + .btn-outline-warning {
+
+        .btn-check:checked+.btn-outline-warning {
             background-color: #ffc107;
             border-color: #ffc107;
             color: white;
         }
-        .btn-check:checked + .btn-outline-success {
+
+        .btn-check:checked+.btn-outline-success {
             background-color: #198754;
             border-color: #198754;
             color: white;
         }
-        .btn-check:checked + .btn-outline-primary {
+
+        .btn-check:checked+.btn-outline-primary {
             background-color: #0d6efd;
             border-color: #0d6efd;
             color: white;
         }
+
         .btn-group .btn:hover {
             transform: translateY(-3px);
-            box-shadow: 0 5px 15px rgba(0,0,0,0.1);
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
         }
     </style>
 </head>
 
 <body>
     <!-- Header area start here -->
-    <?php include 'layouts/header.php';?>
+    <?php include 'layouts/header.php'; ?>
     <!-- Header area end here -->
 
     <main>
@@ -174,7 +188,7 @@ if (isset($_POST['submit'])) {
                         <div class="contact__left-item primary-bg">
                             <h3 class="text-white mb-30">Survei IKM</h3>
                             <p class="text-white">Indeks Kepuasan Masyarakat (IKM) adalah data dan informasi tentang tingkat kepuasan masyarakat yang diperoleh dari hasil pengukuran secara kuantitatif dan kualitatif atas pendapat masyarakat dalam memperoleh pelayanan.</p>
-                            
+
                             <ul class="mt-40 mb-100">
                                 <li>
                                     <div>
@@ -197,7 +211,7 @@ if (isset($_POST['submit'])) {
                                     </div>
                                 </li>
                             </ul>
-                            
+
                             <h4 class="text-white mb-20">Follow Social:</h4>
                             <div class="social">
                                 <a href="#0"><i class="fa-brands fa-whatsapp"></i></a>
@@ -207,7 +221,7 @@ if (isset($_POST['submit'])) {
                             </div>
                         </div>
                     </div>
-                    
+
                     <div class="col-lg-8">
                         <div class="contact__right-item">
                             <div class="section-header mb-20">
@@ -219,7 +233,7 @@ if (isset($_POST['submit'])) {
                                     Form Survei Kepuasan Masyarakat
                                 </h2>
                             </div>
-                            
+
                             <div class="contact__form">
                                 <form action="" method="POST" id="surveiForm">
                                     <!-- Tab Navigation -->
@@ -235,7 +249,7 @@ if (isset($_POST['submit'])) {
                                             </button>
                                         </li>
                                     </ul>
-                                    
+
                                     <!-- Tab Content -->
                                     <div class="tab-content" id="surveiTabContent">
                                         <!-- Tab Data Diri -->
@@ -244,14 +258,14 @@ if (isset($_POST['submit'])) {
                                             <div class="row">
                                                 <div class="col-12 mb-3">
                                                     <label for="nama">Nama Lengkap *</label>
-                                                    <input name="nama" id="nama" class="form-control bg-transparent bor" type="text" placeholder="Masukkan nama lengkap" required>
+                                                    <input name="nama" id="nama" oninput="this.value = this.value.replace(/[^a-zA-Z ]/g, '')" class="form-control bg-transparent bor" type="text" placeholder="Masukkan nama lengkap" required>
                                                 </div>
-                                                
+
                                                 <div class="col-6 mb-3">
                                                     <label for="umur">Umur *</label>
                                                     <input name="umur" id="umur" class="form-control bg-transparent bor" type="number" placeholder="Masukkan umur" min="17" max="100" required>
                                                 </div>
-                                                
+
                                                 <div class="col-6 mb-3">
                                                     <label for="kelamin">Jenis Kelamin *</label>
                                                     <select name="kelamin" id="kelamin" class="form-control bg-transparent bor" required>
@@ -260,27 +274,27 @@ if (isset($_POST['submit'])) {
                                                         <option value="P">Perempuan</option>
                                                     </select>
                                                 </div>
-                                                
+
                                                 <div class="col-6 mb-3">
                                                     <label for="id_pendidikan">Pendidikan Terakhir*</label>
                                                     <select name="id_pendidikan" id="id_pendidikan" class="form-control bg-transparent bor" required>
                                                         <option value="">-- Pilih Pendidikan --</option>
-                                                        <?php while($row = $result_pendidikan->fetch_assoc()): ?>
+                                                        <?php while ($row = $result_pendidikan->fetch_assoc()): ?>
                                                             <option value="<?php echo $row['id']; ?>"><?php echo $row['nama']; ?></option>
                                                         <?php endwhile; ?>
                                                     </select>
                                                 </div>
-                                                
+
                                                 <div class="col-6 mb-3">
                                                     <label for="id_pekerjaan">Pekerjaan *</label>
                                                     <select name="id_pekerjaan" id="id_pekerjaan" class="form-control bg-transparent bor" required>
                                                         <option value="">-- Pilih Pekerjaan --</option>
-                                                        <?php while($row = $result_pekerjaan->fetch_assoc()): ?>
+                                                        <?php while ($row = $result_pekerjaan->fetch_assoc()): ?>
                                                             <option value="<?php echo $row['id']; ?>"><?php echo $row['nama']; ?></option>
                                                         <?php endwhile; ?>
                                                     </select>
                                                 </div>
-                                                
+
                                                 <div class="col-12">
                                                     <button type="button" class="btn btn-primary btn-nav" onclick="nextTab()">
                                                         Lanjut ke Survei <i class="fa fa-arrow-right ms-2"></i>
@@ -288,51 +302,51 @@ if (isset($_POST['submit'])) {
                                                 </div>
                                             </div>
                                         </div>
-                                        
+
                                         <!-- Tab Survei -->
                                         <div class="tab-pane fade" id="survei" role="tabpanel">
                                             <h4 class="mb-4">Survei Kepuasan Masyarakat</h4>
                                             <p class="mb-4">Berikan penilaian Anda terhadap pelayanan kami:</p>
 
-                                            <?php 
+                                            <?php
                                             // Reset pointer hasil query
                                             $result_soal->data_seek(0);
                                             $no = 1;
-                                            while($soal = $result_soal->fetch_assoc()): 
+                                            while ($soal = $result_soal->fetch_assoc()):
                                             ?>
-                                            <div class="survei-question">
-                                                <h6><?php echo $no . ". " . $soal['pertanyaan']; ?></h6>
-                                                <div class="btn-group w-100 mt-3" role="group">
-                                                    <input type="radio" class="btn-check" name="jawaban[<?php echo $soal['id']; ?>]" id="btnradio1_<?php echo $soal['id']; ?>" value="1" required>
-                                                    <label class="btn btn-outline-danger" for="btnradio1_<?php echo $soal['id']; ?>">
-                                                        <i class="fas fa-frown"></i><br>
-                                                        Tidak Baik
-                                                    </label>
+                                                <div class="survei-question">
+                                                    <h6><?php echo $no . ". " . $soal['pertanyaan']; ?></h6>
+                                                    <div class="btn-group w-100 mt-3" role="group">
+                                                        <input type="radio" class="btn-check" name="jawaban[<?php echo $soal['id']; ?>]" id="btnradio1_<?php echo $soal['id']; ?>" value="1" required>
+                                                        <label class="btn btn-outline-danger" for="btnradio1_<?php echo $soal['id']; ?>">
+                                                            <i class="fas fa-frown"></i><br>
+                                                            Tidak Baik
+                                                        </label>
 
-                                                    <input type="radio" class="btn-check" name="jawaban[<?php echo $soal['id']; ?>]" id="btnradio2_<?php echo $soal['id']; ?>" value="2" required>
-                                                    <label class="btn btn-outline-warning" for="btnradio2_<?php echo $soal['id']; ?>">
-                                                        <i class="fas fa-meh"></i><br>
-                                                        Kurang Baik
-                                                    </label>
+                                                        <input type="radio" class="btn-check" name="jawaban[<?php echo $soal['id']; ?>]" id="btnradio2_<?php echo $soal['id']; ?>" value="2" required>
+                                                        <label class="btn btn-outline-warning" for="btnradio2_<?php echo $soal['id']; ?>">
+                                                            <i class="fas fa-meh"></i><br>
+                                                            Kurang Baik
+                                                        </label>
 
-                                                    <input type="radio" class="btn-check" name="jawaban[<?php echo $soal['id']; ?>]" id="btnradio3_<?php echo $soal['id']; ?>" value="3" required>
-                                                    <label class="btn btn-outline-success" for="btnradio3_<?php echo $soal['id']; ?>">
-                                                        <i class="fas fa-smile"></i><br>
-                                                        Baik
-                                                    </label>
+                                                        <input type="radio" class="btn-check" name="jawaban[<?php echo $soal['id']; ?>]" id="btnradio3_<?php echo $soal['id']; ?>" value="3" required>
+                                                        <label class="btn btn-outline-success" for="btnradio3_<?php echo $soal['id']; ?>">
+                                                            <i class="fas fa-smile"></i><br>
+                                                            Baik
+                                                        </label>
 
-                                                    <input type="radio" class="btn-check" name="jawaban[<?php echo $soal['id']; ?>]" id="btnradio4_<?php echo $soal['id']; ?>" value="4" required>
-                                                    <label class="btn btn-outline-primary" for="btnradio4_<?php echo $soal['id']; ?>">
-                                                        <i class="fas fa-grin-stars"></i><br>
-                                                        Sangat Baik
-                                                    </label>
+                                                        <input type="radio" class="btn-check" name="jawaban[<?php echo $soal['id']; ?>]" id="btnradio4_<?php echo $soal['id']; ?>" value="4" required>
+                                                        <label class="btn btn-outline-primary" for="btnradio4_<?php echo $soal['id']; ?>">
+                                                            <i class="fas fa-grin-stars"></i><br>
+                                                            Sangat Baik
+                                                        </label>
+                                                    </div>
                                                 </div>
-                                            </div>
-                                            <?php 
-                                            $no++;
-                                            endwhile; 
+                                            <?php
+                                                $no++;
+                                            endwhile;
                                             ?>
-                                            
+
                                             <div class="row mt-4">
                                                 <div class="col-6">
                                                     <button type="button" class="btn btn-secondary btn-nav" onclick="prevTab()">
@@ -388,7 +402,7 @@ if (isset($_POST['submit'])) {
                         <a href="https://www.youtube.com/@dprdjember" target="blank"><i class="fa-brands fa-youtube"></i></a>
                     </div>
                 </div>
-                
+
                 <div class="footer__item item-big wow fadeInUp" data-wow-delay="600ms" data-wow-duration="1500ms">
                     <h3 class="footer-title">Contact Us</h3>
                     <p class="mb-10">Jl. Kalimantan No. 86 Jember (68121)</p>
@@ -456,7 +470,7 @@ if (isset($_POST['submit'])) {
     <script src="assets/js/jquery.waypoints.js"></script>
     <!-- Script Js -->
     <script src="assets/js/script.js"></script>
-    
+
     <script>
         function validateDataDiri() {
             var nama = document.getElementById('nama').value;
@@ -464,31 +478,31 @@ if (isset($_POST['submit'])) {
             var kelamin = document.getElementById('kelamin').value;
             var pendidikan = document.getElementById('id_pendidikan').value;
             var pekerjaan = document.getElementById('id_pekerjaan').value;
-            
+
             if (!nama || !umur || !kelamin || !pendidikan || !pekerjaan) {
                 alert('Harap lengkapi semua data diri sebelum melanjutkan!');
                 return false;
             }
             return true;
         }
-        
+
         function nextTab() {
             if (validateDataDiri()) {
                 // Enable survei tab
                 document.getElementById('survei-tab').disabled = false;
-                
+
                 // Switch to survei tab
                 var surveiTab = new bootstrap.Tab(document.getElementById('survei-tab'));
                 surveiTab.show();
             }
         }
-        
+
         function prevTab() {
             // Switch back to data diri tab
             var dataDiriTab = new bootstrap.Tab(document.getElementById('datadiri-tab'));
             dataDiriTab.show();
         }
-        
+
         // Prevent form submission if validation fails
         document.getElementById('surveiForm').addEventListener('submit', function(e) {
             if (!validateDataDiri()) {
@@ -496,11 +510,11 @@ if (isset($_POST['submit'])) {
                 alert('Harap lengkapi data diri terlebih dahulu!');
                 return false;
             }
-            
+
             // Check if all survey questions are answered
             var surveyQuestions = document.querySelectorAll('input[type="radio"][required]');
             var groupedQuestions = {};
-            
+
             surveyQuestions.forEach(function(question) {
                 var name = question.getAttribute('name');
                 if (!groupedQuestions[name]) {
@@ -510,7 +524,7 @@ if (isset($_POST['submit'])) {
                     groupedQuestions[name] = true;
                 }
             });
-            
+
             for (var key in groupedQuestions) {
                 if (!groupedQuestions[key]) {
                     e.preventDefault();
@@ -521,4 +535,5 @@ if (isset($_POST['submit'])) {
         });
     </script>
 </body>
+
 </html>
