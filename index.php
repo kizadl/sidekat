@@ -263,26 +263,52 @@ if ($sisa_kuota < 0) {
                     <h2 class="wow fadeInUp" data-wow-delay="200ms" data-wow-duration="1500ms">Layanan Kami</h2>
                 </div>
                 <div class="row g-4">
-                    <div class="col-xl-3 col-md-6 wow fadeInUp" data-wow-delay="00ms" data-wow-duration="1500ms">
+                    <!-- Layanan Pengajuan Kunjungan Kerja -->
+                    <div class="col-xl-3 col-md-6 wow fadeInUp" data-wow-delay="400ms" data-wow-duration="1500ms">
                         <div class="service-three__item">
                             <div class="service-three__image image">
-                                <img src="assets/images/service/magang.jpg" alt="image">
+                                <img src="assets/images/service/kunjungan_kerja.jpg" alt="image">
                             </div>
                             <div class="service-three__content">
                                 <div class="icon">
-                                    <img src="assets/images/icon/magang.png" alt="icon" width="40px">
+                                    <img src="assets/images/icon/kunjungan_kerja.png" alt="icon" width="40px">
                                 </div>
-                                <h5>Pengajuan Magang</h5>
+                                <h5>Kunjungan Kerja</h5>
                             </div>
                             <div class="service-three__up-content text-center">
-                                <h4><a href="magang.html" class="text-white mb-15">Pengajuan Magang</a>
+                                <h4><a href="kunjungan_kerja.html" class="text-white mb-15">Permohonan Kunjungan
+                                        Kerja</a>
                                 </h4>
-                                <p class="text-white">Pengajuan magang siswa/mahasiswa pada DPRD Kabupaten Jember</p>
-                                <a class="mt-10 read-more-btn text-white" href="magang.html">Selengkapnya<i
+                                <p class="text-white">Permohonan Kunjungan Kerja pada DPRD Kabupaten Jember</p>
+                                <a class="mt-10 read-more-btn text-white" href="kunjungan_kerja.html">Selengkapnya<i
                                         class="fa-regular fa-arrow-right-long text-white"></i></a>
                             </div>
                         </div>
                     </div>
+                    
+                    <!-- Layanan Pengajuan Studi Edukasi -->
+                    <div class="col-xl-3 col-md-6 wow fadeInUp" data-wow-delay="400ms" data-wow-duration="1500ms">
+                        <div class="service-three__item">
+                            <div class="service-three__image image">
+                                <img src="assets/images/service/studi.jpg" alt="image">
+                            </div>
+                            <div class="service-three__content">
+                                <div class="icon">
+                                    <img src="assets/images/icon/studi_edukasi.png" alt="icon" width="40px">
+                                </div>
+                                <h5>Pengajuan Studi Edukasi</h5>
+                            </div>
+                            <div class="service-three__up-content text-center">
+                                <h4><a href="studi_edukasi.html" class="text-white mb-15">Pengajuan Studi Edukasi</a>
+                                </h4>
+                                <p class="text-white">Pengajuan studi edukasi pada DPRD Kabupaten Jember</p>
+                                <a class="mt-10 read-more-btn text-white" href="studi_edukasi.html">Selengkapnya<i
+                                        class="fa-regular fa-arrow-right-long text-white"></i></a>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <!-- Layanan Pengajuan Penelitian -->
                     <div class="col-xl-3 col-md-6 wow fadeInUp" data-wow-delay="400ms" data-wow-duration="1500ms">
                         <div class="service-three__item">
                             <div class="service-three__image image">
@@ -304,43 +330,23 @@ if ($sisa_kuota < 0) {
                             </div>
                         </div>
                     </div>
-                    <div class="col-xl-3 col-md-6 wow fadeInUp" data-wow-delay="400ms" data-wow-duration="1500ms">
+                    <!-- Layanan Pengajuan Magang -->
+                    <div class="col-xl-3 col-md-6 wow fadeInUp" data-wow-delay="00ms" data-wow-duration="1500ms">
                         <div class="service-three__item">
                             <div class="service-three__image image">
-                                <img src="assets/images/service/studi.jpg" alt="image">
+                                <img src="assets/images/service/magang.jpg" alt="image">
                             </div>
                             <div class="service-three__content">
                                 <div class="icon">
-                                    <img src="assets/images/icon/studi_edukasi.png" alt="icon" width="40px">
+                                    <img src="assets/images/icon/magang.png" alt="icon" width="40px">
                                 </div>
-                                <h5>Pengajuan Studi Edukasi</h5>
+                                <h5>Pengajuan Magang</h5>
                             </div>
                             <div class="service-three__up-content text-center">
-                                <h4><a href="studi_edukasi.html" class="text-white mb-15">Pengajuan Studi Edukasi</a>
+                                <h4><a href="magang.html" class="text-white mb-15">Pengajuan Magang</a>
                                 </h4>
-                                <p class="text-white">Pengajuan studi edukasi pada DPRD Kabupaten Jember</p>
-                                <a class="mt-10 read-more-btn text-white" href="studi_edukasi.html">Selengkapnya<i
-                                        class="fa-regular fa-arrow-right-long text-white"></i></a>
-                            </div>
-                        </div>
-                    </div>
-                    <div class="col-xl-3 col-md-6 wow fadeInUp" data-wow-delay="400ms" data-wow-duration="1500ms">
-                        <div class="service-three__item">
-                            <div class="service-three__image image">
-                                <img src="assets/images/service/kunjungan_kerja.jpg" alt="image">
-                            </div>
-                            <div class="service-three__content">
-                                <div class="icon">
-                                    <img src="assets/images/icon/kunjungan_kerja.png" alt="icon" width="40px">
-                                </div>
-                                <h5>Kunjungan Kerja</h5>
-                            </div>
-                            <div class="service-three__up-content text-center">
-                                <h4><a href="kunjungan_kerja.html" class="text-white mb-15">Permohonan Kunjungan
-                                        Kerja</a>
-                                </h4>
-                                <p class="text-white">Permohonan Kunjungan Kerja pada DPRD Kabupaten Jember</p>
-                                <a class="mt-10 read-more-btn text-white" href="kunjungan_kerja.html">Selengkapnya<i
+                                <p class="text-white">Pengajuan magang siswa/mahasiswa pada DPRD Kabupaten Jember</p>
+                                <a class="mt-10 read-more-btn text-white" href="magang.html">Selengkapnya<i
                                         class="fa-regular fa-arrow-right-long text-white"></i></a>
                             </div>
                         </div>
