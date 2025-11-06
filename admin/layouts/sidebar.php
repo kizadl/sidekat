@@ -61,6 +61,12 @@
             </li>
             <li class="side-nav-title mt-2">Verifikasi Pengajuan</li>
             <li class="side-nav-item">
+                <a href="verifikasi_rdp.php" class="side-nav-link">
+                    <i class="ri-team-line"></i>
+                    <span>Pengajuan RDP </span>
+                </a>
+            </li>
+            <li class="side-nav-item">
                 <a href="verifikasi_magang.html" class="side-nav-link">
                     <i class="ri-survey-fill"></i>
                     <span>Pengajuan Magang </span>
@@ -93,6 +99,9 @@
                 </a>
                 <div class="dropdown-container" id="dropdownMenuArsip" style="display:none;">
                     <ul class="side-nav-second-level">
+                        <li>
+                            <a href="arsip_rdp.php">Rapat Dengar Pendapat</a>
+                        </li>
                         <li>
                             <a href="arsip_magang.html">Magang</a>
                         </li>

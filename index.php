@@ -72,7 +72,7 @@ if ($sisa_kuota < 0) {
     <!-- Mouse cursor area end here -->
 
     <!-- Header area start here -->
-    <?php include 'layouts/header.php';?>
+    <?php include 'layouts/header.php'; ?>
     <!-- Header area end here -->
 
     <!-- Sidebar area start here -->
@@ -189,7 +189,7 @@ if ($sisa_kuota < 0) {
                                 <h2 class="wow fadeInUp" data-wow-delay="200ms" data-wow-duration="1500ms">Sekilas
                                     Tentang <br> D&D Sidekat</h2>
                                 <p class="wow fadeInUp" data-wow-delay="400ms" data-wow-duration="1500ms"
-                                    style="text-align: justify;">DND Sidekat Kabupaten Jember adalah aplikasi inovasi yang memudahkan proses pengajuan Rapat Dengar Pendapat, Kunjungan Kerja,  Studi Edukasi, Penelitian dan Magang baik dari berbagai instansi pemerintah dan lembaga pendidikan. Dengan DND Sidekat, pengguna dapat mengajukan permohonan secara digital, memantau status pengajuan, serta mendapatkan notifikasi langsung mengenai persetujuan atau penolakan permohonan mereka. Aplikasi ini hadir untuk mempercepat proses administrasi, mengurangi penggunaan kertas, dan menjadikan layanan publik lebih transparan serta efisien. Kini, warga Jember yang ingin mendapatkan pengalaman profesional maupun akademis dapat mengakses kesempatan tersebut dengan lebih mudah melalui DND Sidekat. </p>
+                                    style="text-align: justify;">DND Sidekat Kabupaten Jember adalah aplikasi inovasi yang memudahkan proses pengajuan Rapat Dengar Pendapat, Kunjungan Kerja, Studi Edukasi, Penelitian dan Magang baik dari berbagai instansi pemerintah dan lembaga pendidikan. Dengan DND Sidekat, pengguna dapat mengajukan permohonan secara digital, memantau status pengajuan, serta mendapatkan notifikasi langsung mengenai persetujuan atau penolakan permohonan mereka. Aplikasi ini hadir untuk mempercepat proses administrasi, mengurangi penggunaan kertas, dan menjadikan layanan publik lebih transparan serta efisien. Kini, warga Jember yang ingin mendapatkan pengalaman profesional maupun akademis dapat mengakses kesempatan tersebut dengan lebih mudah melalui DND Sidekat. </p>
                             </div>
 
                         </div>
@@ -263,8 +263,30 @@ if ($sisa_kuota < 0) {
                     <h2 class="wow fadeInUp" data-wow-delay="200ms" data-wow-duration="1500ms">Layanan Kami</h2>
                 </div>
                 <div class="row g-4">
+                    <!-- Layanan Pengajuan Rapat Dengar Pendapat -->
+                    <div class="col-xl-3 col-md-6 wow fadeInUp" data-wow-delay="00ms" data-wow-duration="1500ms">
+                        <div class="service-three__item">
+                            <div class="service-three__image image">
+                                <img src="assets/images/service/kunjungan_kerja.jpg" alt="image">
+                            </div>
+                            <div class="service-three__content">
+                                <div class="icon">
+                                    <img src="assets/images/icon/kunjungan_kerja.png" alt="icon" width="40px">
+                                </div>
+                                <h5>Rapat Dengar Pendapat</h5>
+                            </div>
+                            <div class="service-three__up-content text-center">
+                                <h4><a href="pengajuan_rdp.php" class="text-white mb-15">Pengajuan Rapat Dengar Pendapat</a>
+                                </h4>
+                                <p class="text-white">Pengajuan Rapat Dengar Pendapat pada DPRD Kabupaten Jember</p>
+                                <a class="mt-10 read-more-btn text-white" href="pengajuan_rdp.php">Selengkapnya<i
+                                        class="fa-regular fa-arrow-right-long text-white"></i></a>
+                            </div>
+                        </div>
+                    </div>
+
                     <!-- Layanan Pengajuan Kunjungan Kerja -->
-                    <div class="col-xl-3 col-md-6 wow fadeInUp" data-wow-delay="400ms" data-wow-duration="1500ms">
+                    <div class="col-xl-3 col-md-6 wow fadeInUp" data-wow-delay="200ms" data-wow-duration="1500ms">
                         <div class="service-three__item">
                             <div class="service-three__image image">
                                 <img src="assets/images/service/kunjungan_kerja.jpg" alt="image">
@@ -285,9 +307,9 @@ if ($sisa_kuota < 0) {
                             </div>
                         </div>
                     </div>
-                    
+
                     <!-- Layanan Pengajuan Studi Edukasi -->
-                    <div class="col-xl-3 col-md-6 wow fadeInUp" data-wow-delay="400ms" data-wow-duration="1500ms">
+                    <div class="col-xl-3 col-md-6 wow fadeInUp" data-wow-delay="300ms" data-wow-duration="1500ms">
                         <div class="service-three__item">
                             <div class="service-three__image image">
                                 <img src="assets/images/service/studi.jpg" alt="image">
@@ -307,7 +329,7 @@ if ($sisa_kuota < 0) {
                             </div>
                         </div>
                     </div>
-                    
+
                     <!-- Layanan Pengajuan Penelitian -->
                     <div class="col-xl-3 col-md-6 wow fadeInUp" data-wow-delay="400ms" data-wow-duration="1500ms">
                         <div class="service-three__item">
@@ -331,7 +353,7 @@ if ($sisa_kuota < 0) {
                         </div>
                     </div>
                     <!-- Layanan Pengajuan Magang -->
-                    <div class="col-xl-3 col-md-6 wow fadeInUp" data-wow-delay="00ms" data-wow-duration="1500ms">
+                    <div class="col-xl-3 col-md-6 wow fadeInUp" data-wow-delay="400ms" data-wow-duration="1500ms">
                         <div class="service-three__item">
                             <div class="service-three__image image">
                                 <img src="assets/images/service/magang.jpg" alt="image">

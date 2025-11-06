@@ -2,10 +2,12 @@
 RewriteEngine on
 
 RewriteRule ^login.html$ ../admin/login.php [L]
+RewriteRule ^arsip_rdp.html$ ../admin/arsip_rdp.php [L]
 RewriteRule ^arsip_kunjungan_kerja.html$ ../admin/arsip_kunjungan_kerja.php [L]
 RewriteRule ^arsip_magang.html$ ../admin/arsip_magang.php [L]
 RewriteRule ^arsip_penelitian.html$ ../admin/arsip_penelitian.php [L]
 RewriteRule ^arsip_studi_edukasi.html$ ../admin/arsip_studi_edukasi.php [L]
+RewriteRule ^verifikasi_rdp.html$ ../admin/verifikasi_rdp.php [L]
 RewriteRule ^verifikasi_magang.html$ ../admin/verifikasi_magang.php [L]
 RewriteRule ^verifikasi_penelitian.html$ ../admin/verifikasi_penelitian.php [L]
 RewriteRule ^verifikasi_studi_edukasi.html$ ../admin/verifikasi_studi_edukasi.php [L]

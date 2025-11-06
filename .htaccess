@@ -2,11 +2,13 @@
 RewriteEngine on
 
 RewriteRule ^login.html$ ./admin/login.php [L]
+RewriteRule ^rdp.html$ pengajuan_rdp.php [L]
 RewriteRule ^magang.html$ pengajuan_magang.php [L]
 RewriteRule ^penelitian.html$ pengajuan_penelitian.php [L]
 RewriteRule ^studi_edukasi.html$ pengajuan_studi_edukasi.php [L]
 RewriteRule ^kunjungan_kerja.html$ permohonan_kunjungan_kerja.php [L]
 RewriteRule ^home.html$ index.php [L]
+RewriteRule ^tracking_rdp.html$ tracking_rdp.php [L]
 RewriteRule ^tracking_magang.html$ tracking_magang.php [L]
 RewriteRule ^tracking_penelitian.html$ tracking_penelitian.php [L]
 RewriteRule ^tracking_studi_edukasi.html$ tracking_studi_edukasi.php [L]

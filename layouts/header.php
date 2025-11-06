@@ -21,6 +21,9 @@
                                     <a href="studi_edukasi.html">- Pengajuan Studi Edukasi</a>
                                 </li>
                                 <li>
+                                    <a href="pengajuan_rdp.php">- Pengajuan Rapat Dengar Pendapat</a>
+                                </li>
+                                <li>
                                     <a href="kunjungan_kerja.html">- Kunjungan Kerja</a>
                                 </li>
                             </ul>
@@ -36,6 +39,9 @@
                                 </li>
                                 <li>
                                     <a href="tracking_studi_edukasi.html">- Pengajuan Studi Edukasi</a>
+                                </li>
+                                <li>
+                                    <a href="tracking_rdp.php">- Pengajuan Rapat Dengar Pendapat</a>
                                 </li>
                                 <li>
                                     <a href="tracking_kunjungan_kerja.html">- Kunjungan Kerja</a>
