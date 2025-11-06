@@ -189,18 +189,7 @@ if ($sisa_kuota < 0) {
                                 <h2 class="wow fadeInUp" data-wow-delay="200ms" data-wow-duration="1500ms">Sekilas
                                     Tentang <br> D&D Sidekat</h2>
                                 <p class="wow fadeInUp" data-wow-delay="400ms" data-wow-duration="1500ms"
-                                    style="text-align: justify;">DND Sidekat Kabupaten Jember adalah aplikasi inovatif
-                                    yang
-                                    memudahkan proses pengajuan permohonan magang, penelitian, studi edukasi, dan
-                                    kunjungan kerja di berbagai instansi pemerintah dan
-                                    pendidikan di Kabupaten Jember. Dengan DND Sidekat, pengguna dapat mengajukan
-                                    permohonan secara digital, memantau status pengajuan,
-                                    serta mendapatkan notifikasi langsung mengenai persetujuan atau penolakan permohonan
-                                    mereka. Aplikasi ini hadir untuk mempercepat
-                                    proses administrasi, mengurangi penggunaan kertas, dan menjadikan layanan publik
-                                    lebih transparan serta efisien. Kini, warga Jember
-                                    yang ingin mendapatkan pengalaman profesional maupun akademis dapat mengakses
-                                    kesempatan tersebut dengan lebih mudah melalui DND Sidekat.</p>
+                                    style="text-align: justify;">DND Sidekat Kabupaten Jember adalah aplikasi inovasi yang memudahkan proses pengajuan Rapat Dengar Pendapat, Kunjungan Kerja,  Studi Edukasi, Penelitian dan Magang baik dari berbagai instansi pemerintah dan lembaga pendidikan. Dengan DND Sidekat, pengguna dapat mengajukan permohonan secara digital, memantau status pengajuan, serta mendapatkan notifikasi langsung mengenai persetujuan atau penolakan permohonan mereka. Aplikasi ini hadir untuk mempercepat proses administrasi, mengurangi penggunaan kertas, dan menjadikan layanan publik lebih transparan serta efisien. Kini, warga Jember yang ingin mendapatkan pengalaman profesional maupun akademis dapat mengakses kesempatan tersebut dengan lebih mudah melalui DND Sidekat. </p>
                             </div>
 
                         </div>
